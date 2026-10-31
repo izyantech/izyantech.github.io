@@ -1,6 +1,6 @@
 /* Izyan Tech Manager — offline app shell. Data lives in IndexedDB, never in this cache.
    Bump VERSION whenever a file below changes. */
-const VERSION = 'itwm-v2';
+const VERSION = 'itwm-v3';
 const CORE = [
   './',
   './index.html',

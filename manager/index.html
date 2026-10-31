@@ -88,6 +88,21 @@ table.sch{width:100%;border-collapse:collapse;font-size:13.5px}table.sch th{text
 .pbar{height:8px;border-radius:9px;background:#1a2f48;overflow:hidden;margin:8px 0 4px}.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--green))}
 .hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}.hd .main{flex:1;min-width:0}.hd h3{margin:0 0 2px;font-size:19px}.hd small{color:var(--muted)}
 .av{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#1d3a5c,#12304d);color:var(--gold2);flex-shrink:0}
+.dua{position:relative;border-radius:18px;padding:16px 16px 14px;margin-bottom:12px;background:radial-gradient(circle at 100% 0,rgba(215,168,61,.18),transparent 55%),linear-gradient(160deg,#122a46,#0b1d31);border:1px solid rgba(241,210,122,.4)}
+.dua .dh{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--gold2);text-transform:uppercase;margin-bottom:10px}
+.dua .ar{direction:rtl;text-align:right;font-family:"Amiri","Noto Naskh Arabic","Scheherazade New","Traditional Arabic","Geeza Pro",serif;font-size:23px;line-height:1.95;color:#fff;margin:0 0 8px}
+.dua .tr{font-style:italic;color:#d9e3ef;font-size:13.5px;margin:0 0 6px}.dua .en{font-size:14px;color:#f3f6fb;margin:0 0 6px}.dua .src{font-size:11.5px;color:var(--muted);margin:0}
+.bars{display:flex;align-items:flex-end;gap:5px;height:120px;padding-top:18px;margin:8px 0 2px}
+.bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;height:100%;position:relative;min-width:0}
+.bars .b .v{position:absolute;top:-17px;left:0;right:0;text-align:center;font-size:10.5px;font-weight:800;color:#dfe8f3}
+.bars .b i{display:block;border-radius:4px 4px 0 0}.bars .b i+i{border-radius:0}
+.bars .b.cur .m{color:var(--gold2)}
+.bars .m{font-size:9.5px;color:var(--muted);text-align:center;margin-top:4px;white-space:nowrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}.legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.c-shop{background:var(--gold2)}.c-bill{background:var(--green)}.c-oth{background:var(--blue)}.c-col{background:linear-gradient(180deg,#7ee6ac,#1f9e5a)}
+.rtable{width:100%;border-collapse:collapse;font-size:12.5px}.rtable th{color:var(--muted);font-size:11px;text-align:right;padding:7px 4px;border-bottom:1px solid var(--line);font-weight:700}.rtable th:first-child,.rtable td:first-child{text-align:left}
+.rtable td{text-align:right;padding:8px 4px;border-bottom:1px solid var(--line)}.rtable tr.tot td{font-weight:800;color:var(--gold2);border-bottom:0}.rtable tr.cur td:first-child{color:var(--gold2);font-weight:800}
+.scrollx{overflow-x:auto;margin:0 -4px;padding:0 4px}
 .fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:25}
 /* sheet */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
@@ -412,6 +427,70 @@ function allDues() {
   return out.sort((a, b) => a.r.due.localeCompare(b.r.due));
 }
 const remindedOn = (o, n) => (o.reminders || {})[n] || '';
+
+/* ------------------------------------------------------------ dua of the day */
+const DUAS = [
+  { ar: 'رَبِّ اشْرَحْ لِي صَدْرِي ۝ وَيَسِّرْ لِي أَمْرِي', tr: 'Rabbish-rah lī sadrī, wa yassir lī amrī', en: 'My Lord, expand my chest for me and make my task easy for me.', src: 'Qur’an 20:25–26' },
+  { ar: 'رَّبِّ زِدْنِي عِلْمًا', tr: 'Rabbi zidnī ‘ilmā', en: 'My Lord, increase me in knowledge.', src: 'Qur’an 20:114' },
+  { ar: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', tr: 'Rabbanā ātinā fid-dunyā hasanatan wa fil-ākhirati hasanatan wa qinā ‘adhāban-nār', en: 'Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.', src: 'Qur’an 2:201' },
+  { ar: 'رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ', tr: 'Rabbi innī limā anzalta ilayya min khayrin faqīr', en: 'My Lord, I am truly in need of whatever good You send down to me.', src: 'Qur’an 28:24' },
+  { ar: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا', tr: 'Allāhumma innī as’aluka ‘ilman nāfi‘an, wa rizqan tayyiban, wa ‘amalan mutaqabbalā', en: 'O Allah, I ask You for beneficial knowledge, good and pure provision, and deeds that are accepted.', src: 'Sunan Ibn Mājah 925' },
+  { ar: 'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ', tr: 'Allāhummak-finī bi-halālika ‘an harāmika, wa aghninī bi-fadlika ‘amman siwāk', en: 'O Allah, suffice me with what is lawful instead of what is unlawful, and by Your grace make me free of need of anyone besides You.', src: 'Jāmi‘ at-Tirmidhī 3563' },
+  { ar: 'وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ۝ وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ', tr: 'Wa man yattaqillāha yaj‘al lahū makhrajā, wa yarzuqhu min haythu lā yahtasib', en: 'Whoever is mindful of Allah, He will make a way out for him and provide for him from where he does not expect.', src: 'Qur’an 65:2–3' },
+  { ar: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', tr: 'Hasbunallāhu wa ni‘mal-wakīl', en: 'Allah is sufficient for us, and He is the best Disposer of affairs.', src: 'Qur’an 3:173' },
+  { ar: 'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ ۚ عَلَيْهِ تَوَكَّلْتُ وَإِلَيْهِ أُنِيبُ', tr: 'Wa mā tawfīqī illā billāh, ‘alayhi tawakkaltu wa ilayhi unīb', en: 'My success is only through Allah. In Him I put my trust, and to Him I turn.', src: 'Qur’an 11:88' },
+  { ar: 'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا', tr: 'Allāhumma lā sahla illā mā ja‘altahū sahlā, wa anta taj‘alul-hazna idhā shi’ta sahlā', en: 'O Allah, nothing is easy except what You make easy, and You make the difficult easy if You wish.', src: 'Sahīh Ibn Hibbān 974' },
+  { ar: 'بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', tr: 'Bismillāh, tawakkaltu ‘alallāh, wa lā hawla wa lā quwwata illā billāh', en: 'In the name of Allah, I place my trust in Allah; there is no power and no strength except with Allah.', src: 'Sunan Abī Dāwūd 5095 • Tirmidhī 3426' },
+  { ar: 'رَبَّنَا تَقَبَّلْ مِنَّا ۖ إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ', tr: 'Rabbanā taqabbal minnā, innaka antas-samī‘ul-‘alīm', en: 'Our Lord, accept this from us. You are the All-Hearing, the All-Knowing.', src: 'Qur’an 2:127' },
+  { ar: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ، وَغَلَبَةِ الرِّجَالِ', tr: 'Allāhumma innī a‘ūdhu bika minal-hammi wal-hazan, wal-‘ajzi wal-kasal, wal-bukhli wal-jubn, wa dala‘id-dayni wa ghalabatir-rijāl', en: 'O Allah, I seek refuge in You from worry and grief, from helplessness and laziness, from miserliness and cowardice, from the burden of debt and from being overpowered by people.', src: 'Sahīh al-Bukhārī 6369' },
+  { ar: 'رَّبِّ أَدْخِلْنِي مُدْخَلَ صِدْقٍ وَأَخْرِجْنِي مُخْرَجَ صِدْقٍ وَاجْعَل لِّي مِن لَّدُنكَ سُلْطَانًا نَّصِيرًا', tr: 'Rabbi adkhilnī mudkhala sidqin wa akhrijnī mukhraja sidqin waj‘al lī min ladunka sultānan nasīrā', en: 'My Lord, let me enter with truth and let me leave with truth, and grant me from Yourself a supporting authority.', src: 'Qur’an 17:80' },
+  { ar: 'لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ', tr: 'La’in shakartum la-azīdannakum', en: 'If you are grateful, I will surely increase you (in favour).', src: 'Qur’an 14:7' },
+  { ar: 'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا', tr: 'Fa inna ma‘al-‘usri yusrā, inna ma‘al-‘usri yusrā', en: 'So surely with hardship comes ease. Surely with hardship comes ease.', src: 'Qur’an 94:5–6' },
+  { ar: 'وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ ۚ إِنَّ اللَّهَ بَصِيرٌ بِالْعِبَادِ', tr: 'Wa ufawwidu amrī ilallāh, innallāha basīrun bil-‘ibād', en: 'I entrust my affair to Allah. Indeed, Allah is All-Seeing of His servants.', src: 'Qur’an 40:44' },
+  { ar: 'اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا', tr: 'Allāhumma bārik li-ummatī fī bukūrihā', en: 'O Allah, bless my Ummah in its early mornings. (Start the day’s work early — there is barakah in it.)', src: 'Sunan Abī Dāwūd 2606 • Tirmidhī 1212' }
+];
+function duaOfDay() {
+  const d = new Date();
+  const dayNo = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+  return DUAS[dayNo % DUAS.length];
+}
+
+/* ------------------------------------------------------------ delivery & monthly stats */
+// A project = one delivered product type in an order: a combo (Digital Shop + Billing) counts as 2 projects.
+function deliverables(o) {
+  const g = new Set((o.items || []).filter(i => P(i.qty) > 0).map(i => i.group));
+  const shop = g.has('shop') ? 1 : 0, billing = g.has('billing') ? 1 : 0, other = g.has('custom') ? 1 : 0;
+  return { shop, billing, other, total: shop + billing + other };
+}
+const isDelivered = o => o.stage === 'Live' && !!o.liveDate;
+const ymOf = s => String(s || '').slice(0, 7);
+const addYM = (ym, n) => addMonths(ym + '-01', n).slice(0, 7);
+const fmtYM = ym => { const [y, m] = ym.split('-').map(Number); return MONTHS[m - 1] + ' ' + y; };
+function monthStats(ym) {
+  const out = { ym, orders: 0, value: 0, shop: 0, billing: 0, other: 0, delivered: 0, collected: 0 };
+  live('Orders').forEach(o => {
+    if (o.stage !== 'Enquiry' && o.stage !== 'Cancelled' && ymOf(o.date) === ym) { out.orders++; out.value = R(out.value + orderTotals(o).total); }
+    if (isDelivered(o) && ymOf(o.liveDate) === ym) { const d = deliverables(o); out.shop += d.shop; out.billing += d.billing; out.other += d.other; out.delivered += d.total; }
+  });
+  live('Payments').forEach(p => { if (ymOf(p.date) === ym) out.collected = R(out.collected + P(p.amount)); });
+  return out;
+}
+const lastMonths = (endYM, n = 12) => Array.from({ length: n }, (_, i) => addYM(endYM, i - n + 1));
+function deliveryBars(stats, curYM) {
+  const max = Math.max(1, ...stats.map(s => s.delivered));
+  return '<div class="bars">' + stats.map(s => {
+    const h = v => (v / max * 100).toFixed(1) + '%';
+    return '<div class="b' + (s.ym === curYM ? ' cur' : '') + '" title="' + fmtYM(s.ym) + ': ' + s.delivered + ' delivered">' + (s.delivered ? '<span class="v">' + s.delivered + '</span>' : '') +
+      (s.other ? '<i class="c-oth" style="height:' + h(s.other) + '"></i>' : '') + (s.billing ? '<i class="c-bill" style="height:' + h(s.billing) + '"></i>' : '') + (s.shop ? '<i class="c-shop" style="height:' + h(s.shop) + '"></i>' : '') +
+      '<div class="m">' + MONTHS[Number(s.ym.slice(5)) - 1] + (s.ym.endsWith('-01') ? '<br>' + s.ym.slice(2, 4) : '') + '</div></div>';
+  }).join('') + '</div><div class="legend"><span><i class="c-shop"></i>Digital Shop</span><span><i class="c-bill"></i>Billing App</span><span><i class="c-oth"></i>Other</span></div>';
+}
+function collectionBars(stats, curYM) {
+  const max = Math.max(1, ...stats.map(s => s.collected));
+  const k = v => v >= 100000 ? (v / 100000).toFixed(1).replace(/\.0$/, '') + 'L' : v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k' : String(Math.round(v));
+  return '<div class="bars">' + stats.map(s => '<div class="b' + (s.ym === curYM ? ' cur' : '') + '" title="' + fmtYM(s.ym) + ': ' + rs(s.collected) + '">' + (s.collected ? '<span class="v">' + k(s.collected) + '</span><i class="c-col" style="height:' + (s.collected / max * 100).toFixed(1) + '%"></i>' : '') +
+    '<div class="m">' + MONTHS[Number(s.ym.slice(5)) - 1] + (s.ym.endsWith('-01') ? '<br>' + s.ym.slice(2, 4) : '') + '</div></div>').join('') + '</div>';
+}
 
 /* ------------------------------------------------------------ messages */
 function dueText(r) {
@@ -801,7 +880,7 @@ function render() {
   const [page, a, b] = h.split('/');
   $$('.nav a').forEach(x => x.classList.toggle('on', x.dataset.nav === page || (page === 'order' && x.dataset.nav === 'orders') || (page === 'client' && x.dataset.nav === 'clients')));
   window.scrollTo(0, 0);
-  const pages = { home: renderHome, orders: renderOrders, order: () => renderOrder(a), new: () => renderNew(a), clients: renderClients, client: () => renderClient(a), payments: renderPayments, more: () => renderMore(a) };
+  const pages = { home: renderHome, orders: renderOrders, order: () => renderOrder(a), new: () => renderNew(a), clients: renderClients, client: () => renderClient(a), payments: renderPayments, reports: renderReports, more: () => renderMore(a) };
   (pages[page] || renderHome)(a, b);
   updateChip();
 }
@@ -822,10 +901,17 @@ function renderHome() {
   const renewals = live('Orders').filter(o => o.stage === 'Live' && o.supportUntil && !o.supportRenewed && o.supportUntil <= addDays(td, 30)).sort((a, b) => a.supportUntil.localeCompare(b.supportUntil));
   const unsent = late.filter(d => remindedOn(d.o, d.r.n) !== td).length;
   let html = '';
+  const dua = duaOfDay();
+  html += '<div class="dua"><div class="dh"><span>🤲 Dua of the day</span><span>' + fmtDay(td) + '</span></div><p class="ar" lang="ar">' + esc(dua.ar) + '</p><p class="tr">' + esc(dua.tr) + '</p><p class="en">' + esc(dua.en) + '</p><p class="src">' + esc(dua.src) + '</p></div>';
   if (!st.upiId) html += '<a class="banner" style="display:block;text-decoration:none;color:inherit" href="#more/business">⚙️ Business details and UPI ID are not set yet — needed for the payment QR on invoices. Tap here.</a>';
   if (parseDay(td).getDate() === 1 && late.length) html += '<div class="banner">📅 It is the 1st today — ' + late.length + ' EMI reminder' + (late.length > 1 ? 's' : '') + ' to send' + (unsent < late.length ? ' (' + (late.length - unsent) + ' sent)' : '') + '.</div>';
   html += '<div class="kpis"><div class="kpi green"><small>Collected this month</small><b>' + rs(monthPaid) + '</b></div><div class="kpi gold"><small>Total outstanding</small><b>' + rs(outstanding) + '</b></div>' +
     '<div class="kpi red"><small>Due / overdue now</small><b>' + rs(overdueAmt) + '</b></div><div class="kpi"><small>Orders in progress</small><b>' + active.length + '</b></div></div>';
+  const months12 = lastMonths(ym).map(monthStats), cur = months12[months12.length - 1];
+  const yearDelivered = months12.reduce((a, m) => a + m.delivered, 0);
+  html += '<a class="card" href="#reports" style="display:block;color:inherit;text-decoration:none"><h2>🚀 Projects delivered <span class="cnt">' + fmtYM(ym) + '</span></h2>' +
+    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-size:30px;color:var(--gold2)">' + cur.delivered + '</b><span class="tiny">this month' + (cur.delivered ? ' • 🛍️ ' + cur.shop + ' shop • 🧾 ' + cur.billing + ' billing' + (cur.other ? ' • ✦ ' + cur.other + ' other' : '') : '') + ' • ' + yearDelivered + ' in last 12 months</span></div>' +
+    deliveryBars(months12, ym) + '<div class="tiny" style="text-align:right;color:var(--gold2);font-weight:700;margin-top:8px">Full 12-month report →</div></a>';
   html += '<div class="card"><h2>🔔 Reminders — due till today <span class="cnt">' + late.length + '</span></h2>' + (late.length ? '<div class="list">' + late.map(dueRow).join('') + '</div>' : '<div class="empty">No payments due 🎉</div>') + '</div>';
   html += '<div class="card"><h2>🗓️ Next 7 days <span class="cnt">' + soon.length + '</span></h2>' + (soon.length ? '<div class="list">' + soon.map(dueRow).join('') + '</div>' : '<div class="empty">No EMIs in the next 7 days.</div>') + '</div>';
   if (renewals.length) html += '<div class="card"><h2>🛠️ Support renewals <span class="cnt">' + renewals.length + '</span></h2><div class="list">' + renewals.map(o => { const c = clientOf(o); const past = o.supportUntil < td; return '<div class="row"><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(orderService(o)) + ' • support ' + (past ? 'ended ' : 'till ') + fmtDay(o.supportUntil) + '</small></div><button class="btn sm green wa" data-act="waSupport" data-id="' + o.id + '">' + WA_ICON + 'Remind</button></div>'; }).join('') + '</div></div>';
@@ -875,7 +961,7 @@ function renderOrder(id) {
   // stage flow
   html += '<div class="card"><h2>Order flow</h2><div class="steps">' + STAGES.filter(x => x !== 'Cancelled').map((x, i) => '<button data-stage="' + esc(x) + '" class="' + (x === o.stage ? 'cur' : (o.stage !== 'Cancelled' && i < stageIdx ? 'done' : '')) + '">' + (o.stage !== 'Cancelled' && i < stageIdx ? '✓ ' : '') + esc(x) + '</button>').join('') + '</div>' +
     (o.stage === 'Enquiry' ? '<div class="btns"><button class="btn green wa" data-act="waQuote" data-id="' + o.id + '">' + WA_ICON + 'Send quotation</button><button class="btn gold" data-stage="Confirmed">✓ Confirm order</button></div>' : '') +
-    (o.stage === 'Live' && o.supportUntil ? '<p class="tiny" style="margin:8px 0 0">Live: ' + fmtDay(o.liveDate) + ' • Free support till <b>' + fmtDay(o.supportUntil) + '</b>' + (o.supportRenewed ? ' • renewed' : '') + '</p>' : '') +
+    (o.stage === 'Live' ? '<div class="two" style="margin-top:10px;align-items:end"><label class="f" style="margin:0"><span>Delivered on</span><input class="i" type="date" id="oLive" value="' + esc(o.liveDate || '') + '" max="' + today() + '"></label><p class="tiny" style="margin:0 0 6px">' + (o.supportUntil ? 'Free support till <b>' + fmtDay(o.supportUntil) + '</b>' + (o.supportRenewed ? ' • renewed' : '') : '') + '</p></div>' : '') +
     (chk.length ? '<hr class="s"><h2 style="margin-bottom:4px">Checklist <span class="cnt">' + nDone + '/' + chk.length + '</span></h2><div class="pbar"><i style="width:' + (chk.length ? nDone / chk.length * 100 : 0) + '%"></i></div>' + chk.map(k => '<label class="chk"><input type="checkbox" data-chk="' + esc(k) + '"' + (done[k] ? ' checked' : '') + '><span>' + esc(k) + '</span></label>').join('') : '') + '</div>';
   // items
   html += '<div class="card"><h2>Packages</h2>' + (o.items || []).filter(i => P(i.qty) > 0).map(i => '<div class="row"><div class="main"><b>' + esc(i.name) + '</b>' + (i.note ? '<small>' + esc(i.note) + '</small>' : '') + '<small>' + i.qty + ' × ' + rs(i.price) + '</small></div><div class="amt">' + rs(P(i.qty) * P(i.price)) + '</div></div>').join('') +
@@ -895,6 +981,12 @@ function renderOrder(id) {
   if (o.stage === 'Live' && hasSupportable(o)) html += '<button class="btn block" style="margin-top:8px" data-act="renew" data-id="' + o.id + '">🛠️ Create support renewal order (' + rs(st.supportFee) + ')</button>';
   view().innerHTML = html;
   $$('[data-stage]').forEach(b => b.onclick = () => setStage(o, b.dataset.stage));
+  if ($('#oLive')) $('#oLive').onchange = async e => {
+    const v = e.target.value; if (!v) return;
+    const r = get('Orders', o.id); r.liveDate = v;
+    if (hasSupportable(r) && !r.supportRenewed) r.supportUntil = addYear(v);
+    await saveOne('Orders', r); toast('Delivery date set to ' + fmtDay(v)); renderOrder(o.id);
+  };
   $$('[data-chk]').forEach(cb => cb.onchange = async () => { const r = get('Orders', o.id); r.checklist = Object.assign({}, r.checklist || {}, { [cb.dataset.chk]: cb.checked }); await saveOne('Orders', r); renderOrder(o.id); });
 }
 async function setStage(o, stage) {
@@ -946,6 +1038,8 @@ function renderNew(editId) {
       '<label class="f"><span>First EMI on the 1st of which month?</span><input class="i" type="month" id="nStart" value="' + esc((d.plan.start || firstOfNextMonth(d.date)).slice(0, 7)) + '"></label>' : '') +
     (t.total > 0 ? '<table class="sch"><thead><tr><th>Instalment</th><th>Due date</th><th class="r">Amount</th></tr></thead><tbody>' + sch.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtDay(r.due) + '</td><td class="r">' + rs(r.amount) + '</td></tr>').join('') + '</tbody></table><p class="tiny" style="margin:8px 0 0">Total ' + rs(sch.reduce((a, r) => a + r.amount, 0)) + ' = order total ' + rs(t.total) + ' ✓ • no interest</p>' : '<div class="empty">Select a package first.</div>') + '</div>';
   html += '<div class="card"><h2>4. Details</h2><div class="two"><label class="f"><span>Order date</span><input class="i" type="date" id="nDate" value="' + esc(d.date) + '"></label><label class="f"><span>Stage</span><select class="i" id="nStage">' + STAGES.map(x => '<option' + (x === d.stage ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></label></div>' +
+    (d.stage === 'Live' ? '<label class="f"><span>Delivered on (for past projects, pick the real date)</span><input class="i" type="date" id="nLive" value="' + esc(d.liveDate || today()) + '" max="' + today() + '"></label>' : '') +
+    (!editing && d.stage === 'Live' ? '<label class="chk"><input type="checkbox" id="nPaid"' + (d._paidAll ? ' checked' : '') + '><span>Already fully paid — record ' + rs(t.total) + ' as received on the delivery date (for past projects)</span></label>' : '') +
     '<label class="f"><span>Notes (optional)</span><textarea class="i" id="nNotes" placeholder="Requirements, colours, deadline…">' + esc(d.notes || '') + '</textarea></label></div>';
   html += '<div class="btns grid2"><button class="btn" type="button" id="nCancel">Cancel</button><button class="btn gold" type="button" id="nSave">' + (editing ? 'Save changes' : 'Save order') + '</button></div>';
   view().innerHTML = html;
@@ -978,7 +1072,9 @@ function renderNew(editId) {
   if ($('#nMonths')) $('#nMonths').onchange = e => { d.plan.months = P(e.target.value); rerender(); };
   if ($('#nStart')) $('#nStart').onchange = e => { if (e.target.value) { d.plan.start = e.target.value + '-01'; rerender(); } };
   $('#nDate').onchange = e => { const old = d.date; d.date = e.target.value || today(); if (d.plan.start === firstOfNextMonth(old)) d.plan.start = firstOfNextMonth(d.date); rerender(); };
-  $('#nStage').onchange = e => { d.stage = e.target.value; };
+  $('#nStage').onchange = e => { d.stage = e.target.value; if (d.stage === 'Live' && !d.liveDate) d.liveDate = today(); rerender(); };
+  if ($('#nLive')) $('#nLive').onchange = e => { d.liveDate = e.target.value || today(); };
+  if ($('#nPaid')) $('#nPaid').onchange = e => { d._paidAll = e.target.checked; };
   $('#nNotes').oninput = e => { d.notes = e.target.value; };
   $('#nCancel').onclick = () => { draft = null; location.hash = editing ? '#order/' + editing.id : '#home'; };
   $('#nSave').onclick = async () => {
@@ -988,12 +1084,17 @@ function renderNew(editId) {
     if (d.items.some(i => P(i.qty) > 0 && !(P(i.price) > 0))) { toast('Enter a price for the custom item'); return; }
     if (d.plan.mode === 'emi' && P(d.plan.down) > tt.total) { toast('Advance cannot be more than the total'); return; }
     if (editing) { const paid = paidFor(editing); if (paid > tt.total && !(await confirmBox(rs(paid) + ' has already been received on this order, which is more than the new total ' + rs(tt.total) + '. Save anyway?', 'Save'))) return; }
-    const rec = JSON.parse(JSON.stringify(d)); delete rec._for;
+    const paidAll = !editing && d.stage === 'Live' && d._paidAll;
+    const rec = JSON.parse(JSON.stringify(d)); delete rec._for; delete rec._paidAll;
     rec.items = rec.items.filter(i => P(i.qty) > 0);
     if (rec.plan.mode === 'emi') { rec.plan.down = R(P(rec.plan.down)); rec.plan.months = Math.min(MAX_EMI, Math.max(1, P(rec.plan.months))); rec.plan.start = rec.plan.start || firstOfNextMonth(rec.date); }
-    if (rec.stage === 'Live' && !rec.liveDate) { rec.liveDate = today(); if (hasSupportable(rec)) rec.supportUntil = addYear(rec.liveDate); }
+    if (rec.stage === 'Live') {
+      if (!rec.liveDate) rec.liveDate = today();
+      if (hasSupportable(rec) && !rec.supportRenewed && (!editing || editing.liveDate !== rec.liveDate || !rec.supportUntil)) rec.supportUntil = addYear(rec.liveDate);
+    }
     if (!editing) { await syncIfPossible(); rec.orderNo = nextNumber('order'); }
     await saveOne('Orders', rec, !editing);
+    if (paidAll && tt.total > 0) await saveOne('Payments', { id: uid(), orderId: rec.id, clientId: rec.clientId, date: rec.liveDate || rec.date, amount: tt.total, method: 'Other', reference: 'Paid before using the app' }, true);
     draft = null; toast(editing ? 'Order updated' : 'Order ' + rec.orderNo + ' saved');
     location.hash = '#order/' + rec.id;
   };
@@ -1098,6 +1199,35 @@ function renderPayments() {
   };
 }
 
+/* ------------------------------------------------------------ REPORTS (12 months) */
+let repEnd = '';
+function renderReports() {
+  setTitle('12-month report', true);
+  const curYM = today().slice(0, 7);
+  repEnd = repEnd || curYM;
+  const stats = lastMonths(repEnd).map(monthStats);
+  const tot = stats.reduce((a, s) => { ['orders', 'value', 'shop', 'billing', 'other', 'delivered', 'collected'].forEach(k => { a[k] = R(a[k] + s[k]); }); return a; }, { orders: 0, value: 0, shop: 0, billing: 0, other: 0, delivered: 0, collected: 0 });
+  const best = stats.reduce((b, s) => (s.delivered > (b ? b.delivered : 0) ? s : b), null);
+  view().innerHTML = '<div class="card"><div style="display:flex;align-items:center;gap:8px"><button class="btn sm" id="rPrev">‹ 12</button><b style="flex:1;text-align:center;font-size:14px">' + fmtYM(stats[0].ym) + ' – ' + fmtYM(repEnd) + '</b><button class="btn sm" id="rNext"' + (repEnd >= curYM ? ' disabled style="opacity:.4"' : '') + '>12 ›</button></div></div>' +
+    '<div class="kpis"><div class="kpi gold"><small>Projects delivered</small><b>' + tot.delivered + '</b></div><div class="kpi green"><small>Collected</small><b>' + rs(tot.collected) + '</b></div>' +
+    '<div class="kpi"><small>New orders</small><b>' + tot.orders + '</b></div><div class="kpi"><small>Order value</small><b>' + rs(tot.value) + '</b></div></div>' +
+    '<div class="card"><h2>🚀 Projects delivered by month</h2>' + deliveryBars(stats, curYM) + (best ? '<p class="tiny" style="margin:8px 0 0">Best month: <b>' + fmtYM(best.ym) + '</b> with ' + best.delivered + ' projects • 🛍️ ' + tot.shop + ' shops • 🧾 ' + tot.billing + ' billing apps • ✦ ' + tot.other + ' other in total</p>' : '<p class="tiny" style="margin:8px 0 0">No projects delivered in this period yet. An order counts as delivered when its stage is set to Live.</p>') + '</div>' +
+    '<div class="card"><h2>💰 Collection by month</h2>' + collectionBars(stats, curYM) + '</div>' +
+    '<div class="card"><h2>Month by month</h2><div class="scrollx"><table class="rtable"><thead><tr><th>Month</th><th>Orders</th><th>Value</th><th>Delivered</th><th>🛍️</th><th>🧾</th><th>✦</th><th>Collected</th></tr></thead><tbody>' +
+    stats.slice().reverse().map(s => '<tr class="' + (s.ym === curYM ? 'cur' : '') + '"><td style="white-space:nowrap">' + MONTHS[Number(s.ym.slice(5)) - 1] + ' ’' + s.ym.slice(2, 4) + '</td><td>' + s.orders + '</td><td>' + rs(s.value) + '</td><td>' + s.delivered + '</td><td>' + s.shop + '</td><td>' + s.billing + '</td><td>' + s.other + '</td><td>' + rs(s.collected) + '</td></tr>').join('') +
+    '<tr class="tot"><td>Total</td><td>' + tot.orders + '</td><td>' + rs(tot.value) + '</td><td>' + tot.delivered + '</td><td>' + tot.shop + '</td><td>' + tot.billing + '</td><td>' + tot.other + '</td><td>' + rs(tot.collected) + '</td></tr></tbody></table></div>' +
+    '<p class="tiny" style="margin:10px 0 0">Delivered = orders set to Live, counted in the month of their delivery date. A Digital Shop + Billing combo counts as 2 projects. Support renewals and add-ons are not counted as projects.</p></div>' +
+    '<button class="btn block" id="rCsv">⬇️ Download these 12 months as CSV</button>';
+  $('#rPrev').onclick = () => { repEnd = addYM(repEnd, -12); renderReports(); };
+  $('#rNext').onclick = () => { if (repEnd < curYM) { repEnd = addYM(repEnd, 12) > curYM ? curYM : addYM(repEnd, 12); renderReports(); } };
+  $('#rCsv').onclick = () => {
+    const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const rows = [['Month', 'New orders', 'Order value', 'Projects delivered', 'Digital Shops', 'Billing Apps', 'Other', 'Collected']].concat(stats.map(s => [fmtYM(s.ym), s.orders, s.value, s.delivered, s.shop, s.billing, s.other, s.collected]), [['Total', tot.orders, tot.value, tot.delivered, tot.shop, tot.billing, tot.other, tot.collected]]);
+    const blob = new Blob(['﻿' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'izyan-tech-report-' + stats[0].ym + '-to-' + repEnd + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  };
+}
+
 /* ------------------------------------------------------------ MORE */
 function renderMore(sub) {
   const st = settings();
@@ -1156,7 +1286,7 @@ function renderMore(sub) {
   }
   setTitle('More', false);
   const counts = TABLES.slice(0, 4).map(t => t + ': ' + live(t).length).join(' • ');
-  view().innerHTML = '<div class="card list"><a class="row" href="#payments"><div class="main"><b>📒 Payments</b><small>Monthly collection, CSV export</small></div></a>' +
+  view().innerHTML = '<div class="card list"><a class="row" href="#reports"><div class="main"><b>📊 12-month report</b><small>Orders, projects delivered and collection by month</small></div></a><a class="row" href="#payments"><div class="main"><b>📒 Payments</b><small>Monthly collection, CSV export</small></div></a>' +
     '<a class="row" href="#more/business"><div class="main"><b>🏢 Business details & UPI</b><small>' + esc(st.business) + (st.upiId ? ' • ' + esc(st.upiId) : ' • UPI ID not set') + '</small></div></a>' +
     '<a class="row" href="#more/prices"><div class="main"><b>🏷️ Packages & prices</b><small>Digital Shop, Billing, add-ons</small></div></a>' +
     '<a class="row" href="#more/templates"><div class="main"><b>💬 WhatsApp messages</b><small>Reminder, receipt, invoice, quotation</small></div></a>' +
