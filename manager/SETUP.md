@@ -3,6 +3,8 @@
 App link: **https://izyantech.github.io/manager/**
 (Ye link website pe kahin nahi dikhta. Sirf tumhare liye hai.)
 
+Website `/site/` pe hai aur Manager `/manager/` pe. Dono ka scope alag hai, isliye dono alag apps ki tarah install hote hain.
+
 ## 1) Phone pe app lagao (2 minute)
 
 1. Phone pe upar wala link kholo.
