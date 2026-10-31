@@ -174,6 +174,7 @@ const DEFAULT_SETTINGS = {
   comboDiscount: 1000,
   emiRound: 10,
   supportFee: 1500,
+  deliveryDays: 7,
   catalog: [
     { code: 'DS_STD', group: 'shop', name: 'QR Digital Shop — Standard', price: 5699, unit: '' },
     { code: 'DS_UPI', group: 'shop', name: 'QR Digital Shop + UPI QR Checkout', price: 6699, unit: '' },
@@ -191,7 +192,7 @@ const DEFAULT_SETTINGS = {
     reminder: 'Hi {name} 👋\n\nYour {inst} of *₹{amount}* for *{service}* {dueText}.\nOrder: {orderNo}\nBalance after this payment: ₹{balanceAfter}\n\nUPI: {upi}\n\nPlease share the payment screenshot once done. Thank you! 🙏\n— {business}',
     receipt: 'Hi {name} ✅\n\nWe have received your payment of ₹{amount} ({method}, {date}). Thank you!\nOrder: {orderNo}\nBalance: ₹{balance}\n{nextLine}\n— {business}',
     invoice: 'Hi {name},\n\nPlease find your invoice *{invoiceNo}* attached.\nTotal: ₹{total}\nPaid: ₹{paid}\nBalance: ₹{balance}\n{nextLine}\nUPI: {upi}\n\n— {business}',
-    quote: 'Hi {name} 👋\n\nHere is your quotation ({orderNo}):\n{items}\n{discountLine}*Total: ₹{total}*\n\n{planText}\n\n0% interest — no extra charge on EMI.\nReply to confirm your order.\n— {business}',
+    quote: 'Hi {name} 👋\n\nHere is your quotation ({orderNo}):\n{items}\n{discountLine}*Total: ₹{total}*\n\n{planText}\n\nExpected delivery: {deliveryDate}\n0% interest — no extra charge on EMI.\nReply to confirm your order.\n— {business}',
     support: 'Hi {name} 👋\n\nYour support for *{service}* ends on {supportDate}.\nRenewing support for the next 1 year costs ₹{fee} — includes fixes, small changes and WhatsApp help.\n\nReply to renew.\n— {business}',
     hello: 'Hi {name} 👋\n\n— {business}'
   }
@@ -492,6 +493,23 @@ function collectionBars(stats, curYM) {
     '<div class="m">' + MONTHS[Number(s.ym.slice(5)) - 1] + (s.ym.endsWith('-01') ? '<br>' + s.ym.slice(2, 4) : '') + '</div></div>').join('') + '</div>';
 }
 
+/* ------------------------------------------------------------ delivery deadline */
+const isOpenOrder = o => ACTIVE_STAGES.includes(o.stage) || o.stage === 'Enquiry';
+const daysBetween = (a, b) => Math.round((parseDay(b) - parseDay(a)) / 86400000);
+function deadlineInfo(o) {
+  if (!o.deadline) return null;
+  if (o.stage === 'Live' && o.liveDate) {
+    const late = daysBetween(o.deadline, o.liveDate);
+    return { cls: late > 0 ? 'b-overdue' : 'b-paid', short: late > 0 ? 'Delivered ' + late + 'd late' : 'On time', long: late > 0 ? 'Delivered ' + late + ' day' + (late > 1 ? 's' : '') + ' late' : 'Delivered on time ✓' };
+  }
+  if (o.stage === 'Cancelled') return null;
+  const left = daysBetween(today(), o.deadline);
+  if (left < 0) return { cls: 'b-overdue', short: 'Late ' + (-left) + 'd', long: 'Late by ' + (-left) + ' day' + (left < -1 ? 's' : ''), late: true, left };
+  if (left === 0) return { cls: 'b-due', short: 'Due today', long: 'Delivery due today', left };
+  return { cls: left <= 2 ? 'b-partial' : 'b-upcoming', short: 'Delivery in ' + left + 'd', long: left + ' day' + (left > 1 ? 's' : '') + ' left', left };
+}
+const byDeadline = (a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999');
+
 /* ------------------------------------------------------------ messages */
 function dueText(r) {
   const td = today();
@@ -534,7 +552,7 @@ function msgQuote(o) {
   let disc = '';
   if (t.combo) disc += 'Combo discount: −₹' + inr(t.combo) + '\n';
   if (t.extra) disc += 'Discount: −₹' + inr(t.extra) + '\n';
-  return fill(st.templates.quote, { name: c.name, orderNo: o.orderNo, items, discountLine: disc, total: inr(t.total), planText: planText(o), business: st.business });
+  return fill(st.templates.quote, { name: c.name, orderNo: o.orderNo, items, discountLine: disc, total: inr(t.total), planText: planText(o), deliveryDate: o.deadline ? fmtDay(o.deadline) : 'to be confirmed', business: st.business });
 }
 function msgSupport(o) {
   const st = settings(), c = clientOf(o);
@@ -896,7 +914,9 @@ function renderHome() {
   const late = dues.filter(d => d.r.due <= td);
   const overdueAmt = R(late.reduce((s, d) => s + d.r.pending, 0));
   const soon = dues.filter(d => d.r.due > td && d.r.due <= addDays(td, 7));
-  const active = live('Orders').filter(o => ACTIVE_STAGES.includes(o.stage));
+  const active = live('Orders').filter(o => ACTIVE_STAGES.includes(o.stage)).sort(byDeadline);
+  const lateDel = active.filter(o => (deadlineInfo(o) || {}).late);
+  const dueSoonDel = active.filter(o => { const i = deadlineInfo(o); return i && !i.late && i.left <= 2; });
   const enquiries = live('Orders').filter(o => o.stage === 'Enquiry');
   const renewals = live('Orders').filter(o => o.stage === 'Live' && o.supportUntil && !o.supportRenewed && o.supportUntil <= addDays(td, 30)).sort((a, b) => a.supportUntil.localeCompare(b.supportUntil));
   const unsent = late.filter(d => remindedOn(d.o, d.r.n) !== td).length;
@@ -905,6 +925,8 @@ function renderHome() {
   html += '<div class="dua"><div class="dh"><span>🤲 Dua of the day</span><span>' + fmtDay(td) + '</span></div><p class="ar" lang="ar">' + esc(dua.ar) + '</p><p class="tr">' + esc(dua.tr) + '</p><p class="en">' + esc(dua.en) + '</p><p class="src">' + esc(dua.src) + '</p></div>';
   if (!st.upiId) html += '<a class="banner" style="display:block;text-decoration:none;color:inherit" href="#more/business">⚙️ Business details and UPI ID are not set yet — needed for the payment QR on invoices. Tap here.</a>';
   if (parseDay(td).getDate() === 1 && late.length) html += '<div class="banner">📅 It is the 1st today — ' + late.length + ' EMI reminder' + (late.length > 1 ? 's' : '') + ' to send' + (unsent < late.length ? ' (' + (late.length - unsent) + ' sent)' : '') + '.</div>';
+  if (lateDel.length) html += '<a class="banner" href="#orders" style="display:block;text-decoration:none;color:inherit;border-color:rgba(255,123,123,.5);background:linear-gradient(135deg,rgba(255,123,123,.16),rgba(215,168,61,.08))">⚠️ ' + lateDel.length + ' order' + (lateDel.length > 1 ? 's are' : ' is') + ' past the delivery date: ' + lateDel.slice(0, 3).map(o => esc(clientOf(o).name)).join(', ') + (lateDel.length > 3 ? '…' : '') + '</a>';
+  else if (dueSoonDel.length) html += '<div class="banner">🚚 ' + dueSoonDel.length + ' deliver' + (dueSoonDel.length > 1 ? 'ies' : 'y') + ' due in the next 2 days.</div>';
   html += '<div class="kpis"><div class="kpi green"><small>Collected this month</small><b>' + rs(monthPaid) + '</b></div><div class="kpi gold"><small>Total outstanding</small><b>' + rs(outstanding) + '</b></div>' +
     '<div class="kpi red"><small>Due / overdue now</small><b>' + rs(overdueAmt) + '</b></div><div class="kpi"><small>Orders in progress</small><b>' + active.length + '</b></div></div>';
   const months12 = lastMonths(ym).map(monthStats), cur = months12[months12.length - 1];
@@ -915,7 +937,7 @@ function renderHome() {
   html += '<div class="card"><h2>🔔 Reminders — due till today <span class="cnt">' + late.length + '</span></h2>' + (late.length ? '<div class="list">' + late.map(dueRow).join('') + '</div>' : '<div class="empty">No payments due 🎉</div>') + '</div>';
   html += '<div class="card"><h2>🗓️ Next 7 days <span class="cnt">' + soon.length + '</span></h2>' + (soon.length ? '<div class="list">' + soon.map(dueRow).join('') + '</div>' : '<div class="empty">No EMIs in the next 7 days.</div>') + '</div>';
   if (renewals.length) html += '<div class="card"><h2>🛠️ Support renewals <span class="cnt">' + renewals.length + '</span></h2><div class="list">' + renewals.map(o => { const c = clientOf(o); const past = o.supportUntil < td; return '<div class="row"><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(orderService(o)) + ' • support ' + (past ? 'ended ' : 'till ') + fmtDay(o.supportUntil) + '</small></div><button class="btn sm green wa" data-act="waSupport" data-id="' + o.id + '">' + WA_ICON + 'Remind</button></div>'; }).join('') + '</div></div>';
-  html += '<div class="card"><h2>🚧 Orders in progress <span class="cnt">' + active.length + '</span></h2>' + (active.length ? '<div class="list">' + active.map(orderRow).join('') + '</div>' : '<div class="empty">No orders in progress.</div>') + '</div>';
+  html += '<div class="card"><h2>🚚 Orders in progress — by delivery date <span class="cnt">' + active.length + '</span></h2>' + (active.length ? '<div class="list">' + active.map(orderRow).join('') + '</div>' : '<div class="empty">No orders in progress.</div>') + '</div>';
   if (enquiries.length) html += '<div class="card"><h2>💬 Enquiries <span class="cnt">' + enquiries.length + '</span></h2><div class="list">' + enquiries.map(orderRow).join('') + '</div></div>';
   html += '<a class="btn block" href="#payments" style="margin-top:4px">📒 View all payments</a>';
   view().innerHTML = html;
@@ -927,7 +949,7 @@ function dueRow(d) {
 }
 function orderRow(o) {
   const c = clientOf(o), s = orderState(o);
-  return '<a class="row" href="#order/' + o.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(o.orderNo) + ' • ' + esc(orderService(o)) + '</small><small>' + stageBadge(o.stage) + '</small></div><div class="amt">' + rs(s.total) + (s.balance > 0 && o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="red-t">Due ' + rs(s.balance) + '</small>' : o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="green-t">Fully paid</small>' : '') + '</div></a>';
+  return '<a class="row" href="#order/' + o.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(o.orderNo) + ' • ' + esc(orderService(o)) + '</small><small>' + stageBadge(o.stage) + (o.stage !== 'Live' && deadlineInfo(o) ? ' <span class="badge ' + deadlineInfo(o).cls + '">' + deadlineInfo(o).short + '</span>' : '') + '</small></div><div class="amt">' + rs(s.total) + (s.balance > 0 && o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="red-t">Due ' + rs(s.balance) + '</small>' : o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="green-t">Fully paid</small>' : '') + '</div></a>';
 }
 
 /* ------------------------------------------------------------ ORDERS */
@@ -937,7 +959,7 @@ function renderOrders() {
   const filters = ['Active', 'Enquiry', 'Live', 'Dues', 'All', 'Cancelled'];
   const q = (renderOrders.q || '').toLowerCase();
   let list = live('Orders').sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
-  if (orderFilter === 'Active') list = list.filter(o => ACTIVE_STAGES.includes(o.stage));
+  if (orderFilter === 'Active') list = list.filter(o => ACTIVE_STAGES.includes(o.stage)).sort(byDeadline);
   else if (orderFilter === 'Dues') list = list.filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry' && orderState(o).balance > 0);
   else if (orderFilter !== 'All') list = list.filter(o => o.stage === orderFilter);
   if (q) list = list.filter(o => (o.orderNo + ' ' + clientOf(o).name + ' ' + clientOf(o).business + ' ' + orderService(o)).toLowerCase().includes(q));
@@ -961,6 +983,8 @@ function renderOrder(id) {
   // stage flow
   html += '<div class="card"><h2>Order flow</h2><div class="steps">' + STAGES.filter(x => x !== 'Cancelled').map((x, i) => '<button data-stage="' + esc(x) + '" class="' + (x === o.stage ? 'cur' : (o.stage !== 'Cancelled' && i < stageIdx ? 'done' : '')) + '">' + (o.stage !== 'Cancelled' && i < stageIdx ? '✓ ' : '') + esc(x) + '</button>').join('') + '</div>' +
     (o.stage === 'Enquiry' ? '<div class="btns"><button class="btn green wa" data-act="waQuote" data-id="' + o.id + '">' + WA_ICON + 'Send quotation</button><button class="btn gold" data-stage="Confirmed">✓ Confirm order</button></div>' : '') +
+    (isOpenOrder(o) ? '<div class="two" style="margin-top:10px;align-items:end"><label class="f" style="margin:0"><span>Target delivery date</span><input class="i" type="date" id="oDeadline" value="' + esc(o.deadline || '') + '" min="' + esc(o.date) + '"></label><p style="margin:0 0 10px">' + (deadlineInfo(o) ? '<span class="badge ' + deadlineInfo(o).cls + '">' + deadlineInfo(o).long + '</span>' : '<span class="tiny">Not set</span>') + '</p></div>' : '') +
+    (o.stage === 'Live' && deadlineInfo(o) ? '<p class="tiny" style="margin:10px 0 0">Target was ' + fmtDay(o.deadline) + ' • <span class="badge ' + deadlineInfo(o).cls + '">' + deadlineInfo(o).long + '</span></p>' : '') +
     (o.stage === 'Live' ? '<div class="two" style="margin-top:10px;align-items:end"><label class="f" style="margin:0"><span>Delivered on</span><input class="i" type="date" id="oLive" value="' + esc(o.liveDate || '') + '" max="' + today() + '"></label><p class="tiny" style="margin:0 0 6px">' + (o.supportUntil ? 'Free support till <b>' + fmtDay(o.supportUntil) + '</b>' + (o.supportRenewed ? ' • renewed' : '') : '') + '</p></div>' : '') +
     (chk.length ? '<hr class="s"><h2 style="margin-bottom:4px">Checklist <span class="cnt">' + nDone + '/' + chk.length + '</span></h2><div class="pbar"><i style="width:' + (chk.length ? nDone / chk.length * 100 : 0) + '%"></i></div>' + chk.map(k => '<label class="chk"><input type="checkbox" data-chk="' + esc(k) + '"' + (done[k] ? ' checked' : '') + '><span>' + esc(k) + '</span></label>').join('') : '') + '</div>';
   // items
@@ -981,6 +1005,7 @@ function renderOrder(id) {
   if (o.stage === 'Live' && hasSupportable(o)) html += '<button class="btn block" style="margin-top:8px" data-act="renew" data-id="' + o.id + '">🛠️ Create support renewal order (' + rs(st.supportFee) + ')</button>';
   view().innerHTML = html;
   $$('[data-stage]').forEach(b => b.onclick = () => setStage(o, b.dataset.stage));
+  if ($('#oDeadline')) $('#oDeadline').onchange = async e => { const v = e.target.value; const r = get('Orders', o.id); r.deadline = v || ''; await saveOne('Orders', r); toast(v ? 'Delivery date set to ' + fmtDay(v) : 'Delivery date cleared'); renderOrder(o.id); };
   if ($('#oLive')) $('#oLive').onchange = async e => {
     const v = e.target.value; if (!v) return;
     const r = get('Orders', o.id); r.liveDate = v;
@@ -1009,7 +1034,7 @@ let draft = null;
 function renderNew(editId) {
   const editing = editId ? get('Orders', editId) : null;
   if (!draft || draft._for !== (editId || 'new')) {
-    draft = editing ? JSON.parse(JSON.stringify(editing)) : { id: uid(), orderNo: '', clientId: '', date: today(), stage: 'Confirmed', items: [], plan: { mode: 'full', down: 0, months: 6, start: firstOfNextMonth(today()) }, extraDiscount: 0, notes: '' };
+    draft = editing ? JSON.parse(JSON.stringify(editing)) : { id: uid(), orderNo: '', clientId: '', date: today(), stage: 'Confirmed', items: [], plan: { mode: 'full', down: 0, months: 6, start: firstOfNextMonth(today()) }, extraDiscount: 0, notes: '', deadline: addDays(today(), P(settings().deliveryDays) || 7) };
     draft._for = editId || 'new';
     if (!editing && renderNew.preClient) { draft.clientId = renderNew.preClient; renderNew.preClient = null; }
   }
@@ -1038,6 +1063,7 @@ function renderNew(editId) {
       '<label class="f"><span>First EMI on the 1st of which month?</span><input class="i" type="month" id="nStart" value="' + esc((d.plan.start || firstOfNextMonth(d.date)).slice(0, 7)) + '"></label>' : '') +
     (t.total > 0 ? '<table class="sch"><thead><tr><th>Instalment</th><th>Due date</th><th class="r">Amount</th></tr></thead><tbody>' + sch.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtDay(r.due) + '</td><td class="r">' + rs(r.amount) + '</td></tr>').join('') + '</tbody></table><p class="tiny" style="margin:8px 0 0">Total ' + rs(sch.reduce((a, r) => a + r.amount, 0)) + ' = order total ' + rs(t.total) + ' ✓ • no interest</p>' : '<div class="empty">Select a package first.</div>') + '</div>';
   html += '<div class="card"><h2>4. Details</h2><div class="two"><label class="f"><span>Order date</span><input class="i" type="date" id="nDate" value="' + esc(d.date) + '"></label><label class="f"><span>Stage</span><select class="i" id="nStage">' + STAGES.map(x => '<option' + (x === d.stage ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></label></div>' +
+    '<label class="f"><span>Target delivery date' + (d.stage === 'Live' ? ' (optional for past projects)' : '') + '</span><input class="i" type="date" id="nDeadline" value="' + esc(d.deadline || '') + '" min="' + esc(d.date) + '"></label>' +
     (d.stage === 'Live' ? '<label class="f"><span>Delivered on (for past projects, pick the real date)</span><input class="i" type="date" id="nLive" value="' + esc(d.liveDate || today()) + '" max="' + today() + '"></label>' : '') +
     (!editing && d.stage === 'Live' ? '<label class="chk"><input type="checkbox" id="nPaid"' + (d._paidAll ? ' checked' : '') + '><span>Already fully paid — record ' + rs(t.total) + ' as received on the delivery date (for past projects)</span></label>' : '') +
     '<label class="f"><span>Notes (optional)</span><textarea class="i" id="nNotes" placeholder="Requirements, colours, deadline…">' + esc(d.notes || '') + '</textarea></label></div>';
@@ -1071,7 +1097,8 @@ function renderNew(editId) {
   if ($('#nDown')) $('#nDown').onchange = e => { d.plan.down = Math.max(0, P(e.target.value)); rerender(); };
   if ($('#nMonths')) $('#nMonths').onchange = e => { d.plan.months = P(e.target.value); rerender(); };
   if ($('#nStart')) $('#nStart').onchange = e => { if (e.target.value) { d.plan.start = e.target.value + '-01'; rerender(); } };
-  $('#nDate').onchange = e => { const old = d.date; d.date = e.target.value || today(); if (d.plan.start === firstOfNextMonth(old)) d.plan.start = firstOfNextMonth(d.date); rerender(); };
+  $('#nDate').onchange = e => { const old = d.date; d.date = e.target.value || today(); if (d.plan.start === firstOfNextMonth(old)) d.plan.start = firstOfNextMonth(d.date); if (!editing && (!d.deadline || d.deadline === addDays(old, P(st.deliveryDays) || 7))) d.deadline = addDays(d.date, P(st.deliveryDays) || 7); rerender(); };
+  $('#nDeadline').onchange = e => { d.deadline = e.target.value || ''; };
   $('#nStage').onchange = e => { d.stage = e.target.value; if (d.stage === 'Live' && !d.liveDate) d.liveDate = today(); rerender(); };
   if ($('#nLive')) $('#nLive').onchange = e => { d.liveDate = e.target.value || today(); };
   if ($('#nPaid')) $('#nPaid').onchange = e => { d._paidAll = e.target.checked; };
@@ -1083,6 +1110,7 @@ function renderNew(editId) {
     if (!d.items.some(i => P(i.qty) > 0)) { toast('Select at least one package'); return; }
     if (d.items.some(i => P(i.qty) > 0 && !(P(i.price) > 0))) { toast('Enter a price for the custom item'); return; }
     if (d.plan.mode === 'emi' && P(d.plan.down) > tt.total) { toast('Advance cannot be more than the total'); return; }
+    if (d.deadline && d.deadline < d.date) { toast('Delivery date cannot be before the order date'); return; }
     if (editing) { const paid = paidFor(editing); if (paid > tt.total && !(await confirmBox(rs(paid) + ' has already been received on this order, which is more than the new total ' + rs(tt.total) + '. Save anyway?', 'Save'))) return; }
     const paidAll = !editing && d.stage === 'Live' && d._paidAll;
     const rec = JSON.parse(JSON.stringify(d)); delete rec._for; delete rec._paidAll;
@@ -1240,12 +1268,13 @@ function renderMore(sub) {
       '<div class="two"><label class="f"><span>UPI ID *</span><input class="i" name="upiId" placeholder="name@okaxis" value="' + esc(st.upiId) + '"></label><label class="f"><span>Name on UPI</span><input class="i" name="upiName" value="' + esc(st.upiName) + '"></label></div>' +
       '<div class="two"><label class="f"><span>Number prefix</span><input class="i" name="prefix" maxlength="6" value="' + esc(st.prefix) + '"></label><label class="f"><span>EMI round off (₹)</span><select class="i" name="emiRound">' + [1, 10, 50, 100].map(v => '<option' + (v === P(st.emiRound) ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></label></div>' +
       '<div class="two"><label class="f"><span>Combo discount (₹)</span><input class="i" name="comboDiscount" type="number" min="0" value="' + P(st.comboDiscount) + '"></label><label class="f"><span>Support renewal fee (₹)</span><input class="i" name="supportFee" type="number" min="0" value="' + P(st.supportFee) + '"></label></div>' +
+      '<label class="f"><span>Default delivery time for new orders (days)</span><input class="i" name="deliveryDays" type="number" min="1" max="90" value="' + (P(st.deliveryDays) || 7) + '"></label>' +
       '<button class="btn gold block" type="submit">Save</button></form>';
     $('#bf').onsubmit = async e => {
       e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
       const upi = String(f.upiId).trim();
       if (upi && !/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)) { toast('Enter the UPI ID in the right format (name@bank)'); return; }
-      await saveSettings({ business: f.business.trim() || DEFAULT_SETTINGS.business, tagline: f.tagline.trim(), phone: digits(f.phone) ? waNumber(f.phone) : DEFAULT_SETTINGS.phone, email: f.email.trim(), address: f.address.trim(), upiId: upi, upiName: f.upiName.trim(), prefix: (f.prefix.trim() || 'ITW').toUpperCase(), emiRound: P(f.emiRound) || 1, comboDiscount: Math.max(0, P(f.comboDiscount)), supportFee: Math.max(0, P(f.supportFee)) });
+      await saveSettings({ business: f.business.trim() || DEFAULT_SETTINGS.business, tagline: f.tagline.trim(), phone: digits(f.phone) ? waNumber(f.phone) : DEFAULT_SETTINGS.phone, email: f.email.trim(), address: f.address.trim(), upiId: upi, upiName: f.upiName.trim(), prefix: (f.prefix.trim() || 'ITW').toUpperCase(), emiRound: P(f.emiRound) || 1, comboDiscount: Math.max(0, P(f.comboDiscount)), supportFee: Math.max(0, P(f.supportFee)), deliveryDays: Math.min(90, Math.max(1, Math.round(P(f.deliveryDays) || 7))) });
       toast('Saved'); location.hash = '#more';
     };
     return;
