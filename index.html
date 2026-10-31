@@ -69,6 +69,8 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
 .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.case{position:relative;border-radius:24px;padding:2px;background:linear-gradient(140deg,var(--c1),transparent 40%,transparent 60%,var(--c2))}.case-in{border-radius:22px;padding:26px;height:100%;background:linear-gradient(160deg,#0f2239,#08182a);display:flex;flex-direction:column}
 .case-logo.logo-img{background:#0b1d31;border:1px solid rgba(255,255,255,.14);overflow:hidden;padding:0}.case-logo.logo-img img{width:100%;height:100%;object-fit:cover;display:block}.case-logo.wide{width:100px;padding:6px 8px;background:radial-gradient(circle at 50% 40%,#2a1d08,#0b1d31)}.case-logo.wide img{object-fit:contain}
 .logo-art img{max-width:72%;max-height:88px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}.logo-art img.sq{width:88px;height:88px;border-radius:20px}
+.plan-grid.three{grid-template-columns:repeat(3,1fr)}.plan-for{font-size:12px;color:var(--muted);margin:0 0 8px}.plan .btn{margin-top:auto}
+.combo{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;margin-top:18px;border-color:rgba(37,211,102,.4)}.combo-tag{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:900;letter-spacing:.14em;color:#062515;background:var(--green);padding:12px 7px;border-radius:9px}.combo-body h3{font-size:22px;margin-bottom:6px}.combo-body p{margin:0;font-size:13px}.combo-body s{color:#8395aa}
 .case.khalifa{--c1:#d7a83d;--c2:#7a5418;--acc:#f1d27a}.case.sweet{--c1:#f39bb8;--c2:#d7a83d;--acc:#f7b3c9}
 .case-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}.case-logo{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex-shrink:0;background:linear-gradient(135deg,var(--c1),var(--c2))}.case-head h3{margin:0 0 4px;font-size:20px}.case-head small{color:var(--muted);font-size:12px}.live{margin-left:auto;align-self:flex-start;font-size:9.5px;font-weight:900;letter-spacing:.06em;color:#a5f4bd;background:#123d2b;border:1px solid #1f7650;padding:5px 9px;border-radius:99px;white-space:nowrap}
 .case-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 18px}.case-strip div{border-radius:12px;padding:11px;background:#0b1d31;border:1px solid var(--line)}.case-strip b{display:block;font-size:13px;color:var(--acc)}.case-strip small{font-size:10.5px;color:var(--muted)}
@@ -82,7 +84,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:25;background:#061323f5;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:10px;font-size:10px;font-weight:700;color:#9fb0c5}.tabbar svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.tabbar a.active{color:var(--gold2);background:#10243a}
  body{padding-bottom:72px}.whatsapp-float{bottom:86px;right:14px}.tabbar a{font-size:9.5px}
- .bill-grid,.case-grid{grid-template-columns:1fr}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
+ .bill-grid,.case-grid,.plan-grid.three{grid-template-columns:1fr}.combo{grid-template-columns:1fr}.combo-tag{writing-mode:horizontal-tb;transform:none;justify-self:start;padding:6px 10px}.combo .btn{justify-self:start}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
  .hero-grid,.split,.contact-grid{grid-template-columns:1fr}.hero{padding-top:52px}.visual{min-height:390px;margin:0 0 15px;order:1}.dash{right:0}.service-grid,.sample-grid,.reel-grid,.steps{grid-template-columns:repeat(2,1fr)}.section{padding:60px 0}.page-hero{padding:46px 0 0}.hero-grid{gap:12px}.mock-window{max-width:600px;margin:auto;width:100%}.demo-items{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:520px){
@@ -136,7 +138,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
    <article class="card"><div class="card-icon">▤</div><h3>Excel Automation &amp; Dashboards</h3><p>Smart spreadsheets, reporting dashboards, data cleanup and repetitive-task automation.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#automation">Explore Automation →</a></article>
    <article class="card"><div class="card-icon">▶</div><h3>Reels &amp; Digital Marketing</h3><p>Product reels, promotional videos and social media creatives that make your business stand out.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#reels">Explore Reels →</a></article>
    <article class="card"><div class="card-icon">⌘</div><h3>Custom Tools &amp; WhatsApp Automation</h3><p>Purpose-built tools, enquiry flows and simple automations that reduce manual work.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#automation-tools">Explore Tools →</a></article>
-   <article class="card card-new"><span class="badge badge-new">NEW</span><div class="card-icon">🧾</div><h3>Billing &amp; Inventory Apps</h3><p>Your own shop app for bills on WhatsApp, stock, orders, udhaar and daily reports — works on every phone.</p><div class="price">Custom quote</div><a class="btn btn-gold" href="#billing">Explore Billing Apps →</a></article>
+   <article class="card card-new"><span class="badge badge-new">NEW</span><div class="card-icon">🧾</div><h3>Billing &amp; Inventory Apps</h3><p>Your own shop app for bills on WhatsApp, stock, orders, udhaar and daily reports — works on every phone.</p><div class="price">From ₹5,500</div><a class="btn btn-gold" href="#billing">Explore Billing Apps →</a></article>
   </div>
   <div class="dark-panel next-cta" style="margin-top:16px"><div><h3 style="margin-bottom:6px">✦ Have something else in mind?</h3><p class="muted" style="margin:0;font-size:13px">Tell us the problem you want to solve. We’ll suggest a practical digital solution for your business.</p></div><a class="btn btn-gold" href="#contact" data-service="Other / Custom idea">Share Your Idea →</a></div>
  </div></section>
@@ -243,6 +245,16 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
   </div>
  </div></section>
 
+ <section class="section" id="billing-pricing"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Simple, one-time pricing</span><h2>Pick the App That <span class="gold">Fits Your Shop.</span></h2><p>One-time setup. The app is built around your products and goes live on your phone.</p></div>
+  <div class="plan-grid three">
+   <article class="plan"><h3>Starter</h3><p class="plan-for">For a single counter or home business</p><div class="plan-price">₹5,500 <small>one-time</small></div><ul><li>✓ <b>Single phone</b> billing app</li><li>✓ Quick billing + <b>bills on WhatsApp</b></li><li>✓ Customers &amp; <b>udhaar</b> tracking</li><li>✓ Basic stock list</li><li>✓ <b>Daily sales report</b></li><li>✓ <b>Backup &amp; restore</b> of your data</li></ul><a class="btn btn-ghost" href="#contact" data-service="Billing App — Starter ₹5,500">Choose Starter →</a></article>
+   <article class="plan featured"><span class="badge">RECOMMENDED</span><h3>Pro</h3><p class="plan-for">Like our Sweetness Manager</p><div class="plan-price">₹7,500 <small>one-time</small></div><ul><li>✓ Everything in <b>Starter</b></li><li>✓ <b>Orders</b> with advance &amp; due dates</li><li>✓ Stock with <b>low-stock alerts</b>, purchases &amp; suppliers</li><li>✓ <b>Expenses &amp; monthly profit</b></li><li>✓ Coupons, loyalty &amp; GST on bills</li><li>✓ <b>WhatsApp campaigns</b> &amp; follow-ups</li></ul><a class="btn btn-gold" href="#contact" data-service="Billing App — Pro ₹7,500">Choose Pro →</a></article>
+   <article class="plan"><h3>Multi-Staff</h3><p class="plan-for">Like our Khalifa Business Manager</p><div class="plan-price">₹9,500 <small>one-time</small></div><ul><li>✓ Everything in <b>Pro</b></li><li>✓ <b>3 phones</b> always in sync</li><li>✓ Data in <b>your own Google Sheet</b></li><li>✓ <b>PIN lock</b> for every staff member</li><li>✓ Separate <b>bill series per staff</b></li><li>✓ <b>Audit log</b> of every change</li></ul><a class="btn btn-ghost" href="#contact" data-service="Billing App — Multi-Staff ₹9,500">Choose Multi-Staff →</a></article>
+  </div>
+  <div class="dark-panel combo"><div class="combo-tag">COMBO OFFER</div><div class="combo-body"><h3>Digital Shop + Billing App = <span class="grad-text">Save ₹1,000</span></h3><p class="muted">Take any billing plan together with a QR Digital Shop and get ₹1,000 off. Example: Standard Digital Shop ₹5,699 + Starter ₹5,500 = <s>₹11,199</s> <b class="gold">₹10,199</b></p></div><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I am interested in the Digital Shop + Billing App combo (₹1,000 off). Please share details.">◉ Ask About the Combo</a></div>
+ </div></section>
+
  <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">The difference</span><h2>From Register Book <span class="gold">to Smart App.</span></h2></div>
   <div class="vs">
@@ -300,7 +312,11 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
     <option value="">Choose a service</option>
     <option>QR Digital Shop — Standard ₹5,699</option>
     <option>QR Digital Shop + Personal UPI QR — ₹6,699</option>
+    <option>Billing App — Starter ₹5,500</option>
+    <option>Billing App — Pro ₹7,500</option>
+    <option>Billing App — Multi-Staff ₹9,500</option>
     <option>Billing &amp; Inventory App</option>
+    <option>Digital Shop + Billing App Combo (₹1,000 off)</option>
     <option>Website / Landing Page</option>
     <option>Reels &amp; Videos</option>
     <option>Excel Automation / Dashboards</option>
