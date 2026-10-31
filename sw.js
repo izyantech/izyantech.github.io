@@ -1,6 +1,6 @@
 /* IZYAN TECH WORLD — offline support.
    Bump VERSION whenever index.html or assets change so phones pick up the new site. */
-const VERSION = 'itw-v2';
+const VERSION = 'itw-v3';
 const CORE = [
   './',
   './index.html',
