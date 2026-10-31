@@ -1,0 +1,22 @@
+{
+  "name": "Izyan Tech Manager",
+  "short_name": "ITW Manager",
+  "description": "Clients, orders, 0% EMI, payments, invoices and WhatsApp reminders for IZYAN TECH WORLD.",
+  "id": "/manager/",
+  "start_url": "/manager/?source=app",
+  "scope": "/manager/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071426",
+  "theme_color": "#071426",
+  "lang": "en-IN",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New order", "url": "/manager/#new" },
+    { "name": "Payments", "url": "/manager/#payments" }
+  ]
+}

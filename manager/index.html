@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Izyan Tech Manager</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#071426">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ITW Manager">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+:root{--bg:#071426;--bg2:#0b1d31;--card:#0e2239;--card2:#10263f;--line:rgba(196,215,239,.16);--gold:#d7a83d;--gold2:#f1d27a;--txt:#f3f6fb;--muted:#9fb0c5;--green:#25d366;--red:#ff7b7b;--amber:#ffb86b;--blue:#7cb8ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--gold2)}
+.hide{display:none!important}
+/* top bar */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:#061323f2;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top h1{font-size:17px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .back{border:0;background:#10243a;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:99px;border:1px solid var(--line);background:#0c1f35;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.chip.ok i{background:var(--green)}.chip.busy i{background:var(--gold2)}.chip.pending i{background:var(--amber)}.chip.err i{background:var(--red)}.chip.off i{background:#55657a}
+main{max-width:860px;margin:auto;padding:14px}
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:#061323f7;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;font-size:11px;font-weight:700;color:var(--muted);text-decoration:none}
+.nav a svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a.on{color:var(--gold2);background:#10243a}
+.nav a.plus{color:#1a1a15}.nav a.plus span.pl{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold2),var(--gold));margin-top:-2px}
+.nav a.plus svg{stroke:#1a1a15}.nav a.plus em{font-style:normal;color:var(--muted)}
+/* cards */
+.card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.card h2 .cnt{font-size:11px;background:#1a2f48;color:var(--muted);padding:2px 8px;border-radius:99px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}.kpi b{display:block;font-size:22px;margin-top:2px;letter-spacing:-.5px}
+.kpi.gold b{color:var(--gold2)}.kpi.red b{color:var(--red)}.kpi.green b{color:#7ee6ac}
+.banner{border-radius:16px;padding:14px 16px;margin-bottom:12px;background:linear-gradient(135deg,rgba(37,211,102,.16),rgba(215,168,61,.12));border:1px solid rgba(37,211,102,.4);font-weight:600}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .main{flex:1;min-width:0}.row .main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .main small{color:var(--muted);font-size:12.5px;display:block}
+.row .amt{text-align:right;font-weight:800;white-space:nowrap}.row .amt small{display:block;font-weight:600;font-size:11.5px;color:var(--muted)}
+.list a.row{color:inherit;text-decoration:none}
+.empty{color:var(--muted);font-size:13.5px;padding:8px 0}
+.badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.03em;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.b-paid{background:rgba(37,211,102,.15);color:#7ee6ac}.b-partial{background:rgba(255,184,107,.15);color:var(--amber)}.b-overdue{background:rgba(255,123,123,.16);color:var(--red)}.b-due{background:rgba(241,210,122,.18);color:var(--gold2)}.b-upcoming{background:#1a2f48;color:var(--muted)}
+.b-stage{background:#1a2f48;color:#cfe0f5}.b-live{background:rgba(37,211,102,.15);color:#7ee6ac}.b-cancel{background:rgba(255,123,123,.12);color:var(--red)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);background:#10243a;color:var(--txt);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;min-height:42px}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1a15;border:0}
+.btn.green{background:var(--green);color:#062515;border:0}
+.btn.red{background:rgba(255,123,123,.12);color:var(--red);border-color:rgba(255,123,123,.35)}
+.btn.sm{padding:6px 10px;min-height:34px;font-size:12.5px;border-radius:10px}
+.btn.block{width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns.grid2{display:grid;grid-template-columns:1fr 1fr}
+.wa svg{width:17px;height:17px;fill:currentColor}
+/* forms */
+label.f{display:block;margin-bottom:12px}label.f>span{display:block;font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:5px}
+input.i,select.i,textarea.i{width:100%;padding:12px;border-radius:12px;border:1px solid #2c4360;background:#071729;font-size:16px;outline:none}
+input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--gold)}
+textarea.i{min-height:110px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.search{position:relative;margin-bottom:12px}.search input{padding-left:38px}.search svg{position:absolute;left:12px;top:13px;width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2}
+.seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}
+.seg button{flex-shrink:0;border:1px solid var(--line);background:#0c1f35;color:var(--muted);border-radius:99px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer}.seg button.on{background:rgba(215,168,61,.16);border-color:rgba(215,168,61,.6);color:var(--gold2)}
+/* packages */
+.pk{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:#0b1d31}
+.pk.on{border-color:var(--gold);background:rgba(215,168,61,.08)}
+.pk .main{flex:1}.pk .main b{display:block;font-size:14px}.pk .main small{color:var(--muted);font-size:12px}
+.qty{display:flex;align-items:center;gap:6px}.qty button{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:#10243a;font-size:18px;cursor:pointer}.qty input{width:84px;text-align:right;padding:7px 8px;border-radius:10px;border:1px solid #2c4360;background:#071729;font-size:15px}
+.sum{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px}.sum div{display:flex;justify-content:space-between;padding:3px 0;font-size:14px}.sum .tot{font-size:18px;font-weight:800;color:var(--gold2)}
+.green-t{color:#7ee6ac}.red-t{color:var(--red)}.muted{color:var(--muted)}
+table.sch{width:100%;border-collapse:collapse;font-size:13.5px}table.sch th{text-align:left;color:var(--muted);font-size:11.5px;font-weight:700;padding:6px 4px;border-bottom:1px solid var(--line)}table.sch td{padding:8px 4px;border-bottom:1px solid var(--line)}table.sch td.r,table.sch th.r{text-align:right}
+.steps{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:4px 0 12px}.steps::-webkit-scrollbar{display:none}
+.steps button{flex-shrink:0;border:1px solid var(--line);background:#0c1f35;color:var(--muted);border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.steps button.done{color:#7ee6ac;border-color:rgba(37,211,102,.35)}.steps button.cur{background:rgba(215,168,61,.18);color:var(--gold2);border-color:var(--gold)}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}.chk:first-of-type{border-top:0}.chk input{width:20px;height:20px;accent-color:var(--green)}
+.pbar{height:8px;border-radius:9px;background:#1a2f48;overflow:hidden;margin:8px 0 4px}.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--green))}
+.hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}.hd .main{flex:1;min-width:0}.hd h3{margin:0 0 2px;font-size:19px}.hd small{color:var(--muted)}
+.av{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#1d3a5c,#12304d);color:var(--gold2);flex-shrink:0}
+.fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:25}
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:min(640px,100%);max-height:92vh;overflow:auto;background:#0a1a2d;border:1px solid var(--line);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 14px;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+.sheet h3 button{border:0;background:#1a2f48;border-radius:10px;width:34px;height:34px;font-size:18px;cursor:pointer}
+@media(min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:22px}}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#e9f7ef;color:#062515;font-weight:700;padding:11px 16px;border-radius:12px;z-index:90;box-shadow:0 12px 30px #0008;max-width:90vw;text-align:center;font-size:14px}
+/* lock */
+.lock{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 20%,#173454,#071426 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.lock .logo{width:72px;height:72px;border-radius:20px;margin-bottom:14px}
+.lock h2{margin:0 0 4px}.lock p{color:var(--muted);margin:0 0 18px;font-size:14px}
+.dots{display:flex;gap:12px;justify-content:center;margin:6px 0 18px}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold2)}.dots i.f{background:var(--gold2)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}.pad button{height:62px;border-radius:18px;border:1px solid var(--line);background:#0e2239;font-size:24px;font-weight:700;cursor:pointer}
+.lock .err{color:var(--red);min-height:20px;font-size:13.5px;margin-bottom:6px}
+.lock form{width:min(360px,100%);text-align:left}
+.tiny{font-size:12px;color:var(--muted)}
+hr.s{border:0;border-top:1px solid var(--line);margin:14px 0}
+code.k{background:#0c1f35;border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:12.5px}
+ol.guide{padding-left:20px;margin:6px 0}ol.guide li{margin:6px 0;font-size:13.5px;color:#d5e0ee}
+</style>
+</head>
+<body>
+<div id="lock" class="lock hide"></div>
+
+<header class="top">
+ <button class="back hide" id="backBtn" aria-label="Back">‹</button>
+ <h1 id="title">Izyan Tech Manager</h1>
+ <button class="chip off" id="syncChip" type="button"><i></i><span>Local</span></button>
+</header>
+<main id="view"></main>
+
+<nav class="nav" aria-label="Main">
+ <a href="#home" data-nav="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</a>
+ <a href="#orders" data-nav="orders"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
+ <a href="#new" data-nav="new" class="plus"><span class="pl"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><em>New</em></a>
+ <a href="#clients" data-nav="clients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20a6.5 6.5 0 0 0-3-5.5"/></svg>Clients</a>
+ <a href="#more" data-nav="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</a>
+</nav>
+<div id="toast" class="hide"></div>
+<input type="file" id="importFile" accept="application/json,.json" class="hide">
+
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/dejavu.js"></script>
+<script src="vendor/dejavu-Bold.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   Izyan Tech Manager — clients, orders, 0% EMI, payments, invoices,
+   WhatsApp reminders. Data on this device (IndexedDB) + Google Sheet sync.
+   ===================================================================== */
+const TABLES = ['Clients', 'Orders', 'Payments', 'Invoices', 'Settings'];
+const STAGES = ['Enquiry', 'Confirmed', 'Content received', 'In progress', 'Review', 'Live', 'Cancelled'];
+const ACTIVE_STAGES = ['Confirmed', 'Content received', 'In progress', 'Review'];
+const METHODS = ['UPI', 'Cash', 'Bank transfer', 'Other'];
+const MAX_EMI = 14;
+
+const DEFAULT_SETTINGS = {
+  business: 'IZYAN TECH WORLD',
+  tagline: 'Digital shops • Billing apps • Websites • Reels • Automation',
+  phone: '919136680597',
+  email: '',
+  address: '',
+  upiId: '',
+  upiName: 'IZYAN TECH WORLD',
+  prefix: 'ITW',
+  comboDiscount: 1000,
+  emiRound: 10,
+  supportFee: 1500,
+  catalog: [
+    { code: 'DS_STD', group: 'shop', name: 'QR Digital Shop — Standard', price: 5699, unit: '' },
+    { code: 'DS_UPI', group: 'shop', name: 'QR Digital Shop + UPI QR Checkout', price: 6699, unit: '' },
+    { code: 'BL_STARTER', group: 'billing', name: 'Billing App — Starter', price: 5500, unit: '' },
+    { code: 'BL_PRO', group: 'billing', name: 'Billing App — Pro', price: 7500, unit: '' },
+    { code: 'BL_MULTI', group: 'billing', name: 'Billing App — Multi-Staff', price: 9500, unit: '' },
+    { code: 'PHOTOS', group: 'addon', name: 'Extra product photos (per 10)', price: 500, unit: 'set of 10' },
+    { code: 'SUPPORT', group: 'support', name: 'Yearly support renewal', price: 1500, unit: 'year' },
+    { code: 'WEBSITE', group: 'custom', name: 'Website / Landing page', price: 0, unit: '' },
+    { code: 'REELS', group: 'custom', name: 'Reels & digital marketing', price: 0, unit: '' },
+    { code: 'EXCEL', group: 'custom', name: 'Excel automation / Dashboard', price: 0, unit: '' },
+    { code: 'TOOL', group: 'custom', name: 'Custom tool / WhatsApp automation', price: 0, unit: '' }
+  ],
+  templates: {
+    reminder: 'Hi {name} 👋\n\nAapke *{service}* ki EMI {inst} — *₹{amount}* {dueText}.\nOrder: {orderNo}\nIske baad baaki: ₹{balanceAfter}\n\nUPI: {upi}\n\nPayment ke baad screenshot bhej dijiye. Shukriya! 🙏\n— {business}',
+    receipt: 'Hi {name} ✅\n\n₹{amount} ka payment mil gaya ({method}, {date}). Shukriya!\nOrder: {orderNo}\nBaaki balance: ₹{balance}\n{nextLine}\n— {business}',
+    invoice: 'Hi {name},\n\nAapka invoice *{invoiceNo}* attach hai.\nTotal: ₹{total}\nPaid: ₹{paid}\nBaaki: ₹{balance}\n{nextLine}\nUPI: {upi}\n\n— {business}',
+    quote: 'Hi {name} 👋\n\nAapke liye quotation ({orderNo}):\n{items}\n{discountLine}*Total: ₹{total}*\n\n{planText}\n\n0% interest — EMI pe koi extra charge nahi.\nConfirm karne ke liye reply kijiye.\n— {business}',
+    support: 'Hi {name} 👋\n\nAapke *{service}* ka support {supportDate} ko khatam ho raha hai.\nAgle 1 saal ka support renew karne ka charge ₹{fee} hai — fixes, small changes aur WhatsApp help ke saath.\n\nRenew karne ke liye reply kijiye.\n— {business}',
+    hello: 'Hi {name} 👋\n\n— {business}'
+  }
+};
+
+/* ------------------------------------------------------------ utilities */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const R = n => Math.round((Number(n) || 0) * 100) / 100;
+const P = n => Number(n) || 0;
+const inr = n => { const v = R(n); return v.toLocaleString('en-IN', { maximumFractionDigits: 2 }); };
+const rs = n => '₹' + inr(n);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad2 = n => String(n).padStart(2, '0');
+const isoDay = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const today = () => isoDay(new Date());
+const nowISO = () => new Date().toISOString();
+const parseDay = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, (m || 1) - 1, d || 1); };
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmtDay = s => { if (!s) return ''; const d = parseDay(s); return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); };
+const fmtShort = s => { if (!s) return ''; const d = parseDay(s); return d.getDate() + ' ' + MONTHS[d.getMonth()]; };
+const addMonths = (s, n) => { const d = parseDay(s); return isoDay(new Date(d.getFullYear(), d.getMonth() + n, 1)); };
+const firstOfNextMonth = s => addMonths(s, 1);
+const addDays = (s, n) => { const d = parseDay(s); d.setDate(d.getDate() + n); return isoDay(d); };
+const addYear = s => { const d = parseDay(s); return isoDay(new Date(d.getFullYear() + 1, d.getMonth(), d.getDate())); };
+const initials = s => String(s || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+const digits = s => String(s || '').replace(/\D/g, '');
+function waNumber(phone) {
+  let d = digits(phone);
+  if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
+  if (d.length === 10) d = '91' + d;
+  return d;
+}
+const fmtPhone = phone => { const d = waNumber(phone); return d.length === 12 ? '+' + d.slice(0, 2) + ' ' + d.slice(2, 7) + ' ' + d.slice(7) : (d ? '+' + d : ''); };
+const waLink = (phone, text) => 'https://wa.me/' + waNumber(phone) + '?text=' + encodeURIComponent(text);
+const fill = (tpl, data) => String(tpl || '').replace(/\{(\w+)\}/g, (m, k) => data[k] !== undefined ? data[k] : m);
+const WA_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
+
+function toast(msg, ms = 2600) {
+  const t = $('#toast'); t.textContent = msg; t.classList.remove('hide');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add('hide'), ms);
+}
+
+/* ------------------------------------------------------------ IndexedDB */
+const idb = {
+  db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const rq = indexedDB.open('itw-manager', 1);
+      rq.onupgradeneeded = () => { const db = rq.result; if (!db.objectStoreNames.contains('rec')) db.createObjectStore('rec'); if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta'); };
+      rq.onsuccess = () => { this.db = rq.result; res(); };
+      rq.onerror = () => rej(rq.error);
+    });
+  },
+  tx(store, mode, fn) {
+    return new Promise((res, rej) => {
+      const t = this.db.transaction(store, mode); const s = t.objectStore(store); const out = fn(s);
+      t.oncomplete = () => res(out && out.result !== undefined ? out.result : undefined); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+    });
+  },
+  put(store, k, v) { return this.tx(store, 'readwrite', s => { s.put(v, k); }); },
+  putMany(store, pairs) { return pairs.length ? this.tx(store, 'readwrite', s => { pairs.forEach(([k, v]) => s.put(v, k)); }) : Promise.resolve(); },
+  getAll(store) {
+    return new Promise((res, rej) => {
+      const out = []; const t = this.db.transaction(store, 'readonly'); const c = t.objectStore(store).openCursor();
+      c.onsuccess = () => { const cur = c.result; if (cur) { out.push([cur.key, cur.value]); cur.continue(); } else res(out); };
+      c.onerror = () => rej(c.error);
+    });
+  },
+  clear(store) { return this.tx(store, 'readwrite', s => { s.clear(); }); }
+};
+
+/* ------------------------------------------------------------ state */
+const S = {
+  me: null, url: '', key: '', outbox: new Set(), cursor: 0, lastSync: 0,
+  t: Object.fromEntries(TABLES.map(t => [t, new Map()])),
+  sync: { state: 'off', msg: '' }, unlocked: false
+};
+async function loadAll() {
+  await idb.open();
+  const meta = Object.fromEntries(await idb.getAll('meta'));
+  S.me = meta.profile || null;
+  S.url = (meta.conn && meta.conn.url) || ''; S.key = (meta.conn && meta.conn.key) || '';
+  S.outbox = new Set(meta.outbox || []);
+  S.cursor = Number(meta.cursor) || 0; S.lastSync = Number(meta.lastSync) || 0;
+  for (const [k, v] of await idb.getAll('rec')) { const t = k.slice(0, k.indexOf('|')); if (S.t[t]) S.t[t].set(v.id, v); }
+}
+const saveMeta = (k, v) => idb.put('meta', k, v);
+const saveOutbox = () => saveMeta('outbox', [...S.outbox]);
+const putRecs = list => idb.putMany('rec', list.map(([t, r]) => [t + '|' + r.id, r]));
+const live = t => [...S.t[t].values()].filter(r => !r.deleted);
+const get = (t, id) => { const r = S.t[t].get(id); return r && !r.deleted ? r : null; };
+
+function stamp(r, isNew) {
+  if (isNew) { r.createdAt = r.createdAt || nowISO(); r.deleted = false; r.rev = 0; }
+  r.updatedAt = nowISO(); r.updatedBy = (S.me && S.me.name) || 'me'; r.rev = (Number(r.rev) || 0) + 1;
+  return r;
+}
+async function save(list) {               // [[table, record, isNew], ...]
+  const pairs = list.map(([t, r, isNew]) => { stamp(r, isNew); S.t[t].set(r.id, r); S.outbox.add(t + '|' + r.id); return [t, r]; });
+  await putRecs(pairs); await saveOutbox();
+  updateChip(); scheduleSync();
+}
+const saveOne = (t, r, isNew) => save([[t, r, isNew]]);
+async function remove(t, r) { r.deleted = true; await saveOne(t, r); }
+
+/* settings live in one synced record (Settings / main) */
+function settings() {
+  const r = S.t.Settings.get('main');
+  const v = r && r.data ? r.data : {};
+  const out = Object.assign({}, DEFAULT_SETTINGS, v);
+  out.templates = Object.assign({}, DEFAULT_SETTINGS.templates, v.templates || {});
+  out.catalog = Array.isArray(v.catalog) && v.catalog.length ? v.catalog : DEFAULT_SETTINGS.catalog;
+  return out;
+}
+async function saveSettings(patch) {
+  const cur = S.t.Settings.get('main');
+  const rec = cur ? JSON.parse(JSON.stringify(cur)) : { id: 'main', key: 'main', data: {} };
+  rec.data = Object.assign({}, rec.data || {}, patch);
+  await saveOne('Settings', rec, !cur);
+}
+
+/* ------------------------------------------------------------ business logic */
+const catalogItem = code => settings().catalog.find(c => c.code === code);
+
+function orderTotals(o) {
+  const st = settings();
+  const items = o.items || [];
+  const subtotal = R(items.reduce((s, it) => s + P(it.price) * P(it.qty || 1), 0));
+  const hasShop = items.some(it => it.group === 'shop' && P(it.qty) > 0);
+  const hasBilling = items.some(it => it.group === 'billing' && P(it.qty) > 0);
+  const combo = o.noCombo ? 0 : (hasShop && hasBilling ? P(st.comboDiscount) : 0);
+  const extra = Math.max(0, P(o.extraDiscount));
+  const total = Math.max(0, R(subtotal - combo - extra));
+  return { subtotal, combo, extra, total };
+}
+
+/* EMI schedule — 0% interest. Advance due on the order date, instalments on the 1st of each month.
+   Instalments are rounded down to emiRound; the last one absorbs the difference. */
+function buildSchedule(o) {
+  const { total } = orderTotals(o);
+  const plan = o.plan || { mode: 'full' };
+  const date = o.date || today();
+  if (plan.mode !== 'emi') return [{ n: 0, label: 'Full payment', due: date, amount: total }];
+  const down = Math.min(Math.max(0, R(plan.down)), total);
+  const months = Math.min(MAX_EMI, Math.max(1, Math.round(P(plan.months) || 1)));
+  const start = plan.start || firstOfNextMonth(date);
+  const rest = R(total - down);
+  const rows = [];
+  if (down > 0) rows.push({ n: 0, label: 'Advance', due: date, amount: down });
+  if (rest > 0) {
+    const step = Math.max(1, P(settings().emiRound) || 1);
+    let base = Math.floor(rest / months / step) * step;
+    if (base <= 0) base = Math.floor(rest / months);
+    for (let i = 1; i <= months; i++) {
+      const amount = i < months ? base : R(rest - base * (months - 1));
+      rows.push({ n: i, label: 'EMI ' + i + '/' + months, due: addMonths(start, i - 1), amount });
+    }
+  }
+  return rows;
+}
+
+const orderPayments = o => live('Payments').filter(p => p.orderId === o.id).sort((a, b) => (a.date + a.createdAt).localeCompare(b.date + b.createdAt));
+const paidFor = o => R(orderPayments(o).reduce((s, p) => s + P(p.amount), 0));
+
+/* allocates payments to the schedule, oldest due first */
+function orderState(o) {
+  const t = orderTotals(o);
+  const paid = paidFor(o);
+  const td = today();
+  let left = paid;
+  const rows = buildSchedule(o).map(r => {
+    const got = R(Math.min(left, r.amount)); left = R(left - got);
+    let status;
+    if (got >= r.amount - 0.001) status = 'paid';
+    else if (r.due < td) status = 'overdue';
+    else if (r.due === td) status = 'due';
+    else if (got > 0) status = 'partial';
+    else status = 'upcoming';
+    return Object.assign({}, r, { paid: got, pending: R(r.amount - got), status });
+  });
+  const balance = R(Math.max(0, t.total - paid));
+  const next = rows.find(r => r.status !== 'paid') || null;
+  const cancelled = o.stage === 'Cancelled';
+  return Object.assign({}, t, { paid, balance, rows, next, cancelled, extraPaid: R(Math.max(0, paid - t.total)) });
+}
+
+function orderService(o) {
+  const names = (o.items || []).filter(i => P(i.qty) > 0).map(i => i.name.replace(/ — /g, ' ').replace(/ \(per 10\)/, ''));
+  return names.length ? names.join(' + ') : 'order';
+}
+const clientOf = o => get('Clients', o.clientId) || { name: 'Unknown client', phone: '' };
+const stageBadge = s => '<span class="badge ' + (s === 'Live' ? 'b-live' : s === 'Cancelled' ? 'b-cancel' : 'b-stage') + '">' + esc(s) + '</span>';
+const statusBadge = s => '<span class="badge b-' + s + '">' + ({ paid: 'Paid', partial: 'Part paid', overdue: 'Overdue', due: 'Due today', upcoming: 'Upcoming' }[s] || s) + '</span>';
+
+function nextNumber(kind) {
+  const st = settings(), yr = new Date().getFullYear();
+  if (kind === 'order') {
+    const max = live('Orders').reduce((m, o) => Math.max(m, Number(String(o.orderNo || '').split('-').pop()) || 0), 0);
+    return st.prefix + '-' + String(max + 1).padStart(4, '0');
+  }
+  const tag = kind === 'receipt' ? st.prefix + '-R-' + yr + '-' : st.prefix + '-' + yr + '-';
+  const max = live('Invoices').filter(i => String(i.invoiceNo || '').startsWith(tag))
+    .reduce((m, i) => Math.max(m, Number(String(i.invoiceNo).slice(tag.length)) || 0), 0);
+  return tag + String(max + 1).padStart(4, '0');
+}
+
+const CHECKLISTS = {
+  shop: ['Logo received', 'Product list & prices', 'Product photos', 'WhatsApp number for orders', 'UPI ID (for UPI plan)', 'Shop live link shared', 'QR code delivered'],
+  billing: ['Product list & prices', 'Staff names & phones', 'Opening stock', 'Google Sheet set up', 'App installed on phones', 'Training done'],
+  generic: ['Requirements confirmed', 'Content received', 'First draft shared', 'Changes done', 'Delivered']
+};
+function checklistFor(o) {
+  const groups = new Set((o.items || []).filter(i => P(i.qty) > 0).map(i => i.group));
+  const list = [];
+  const upiPlan = (o.items || []).some(i => i.code === 'DS_UPI' && P(i.qty) > 0);
+  if (groups.has('shop')) CHECKLISTS.shop.forEach(x => { if (x.startsWith('UPI ID') && !upiPlan) return; list.push('Shop: ' + x.replace(' (for UPI plan)', '')); });
+  if (groups.has('billing')) CHECKLISTS.billing.forEach(x => list.push('Billing: ' + x));
+  if (groups.has('custom') || (!groups.has('shop') && !groups.has('billing'))) CHECKLISTS.generic.forEach(x => list.push(x));
+  return list;
+}
+const hasSupportable = o => (o.items || []).some(i => (i.group === 'shop' || i.group === 'billing') && P(i.qty) > 0);
+
+/* dues across all orders */
+function allDues() {
+  const out = [];
+  live('Orders').forEach(o => {
+    if (o.stage === 'Cancelled' || o.stage === 'Enquiry') return;
+    const st = orderState(o);
+    st.rows.forEach(r => { if (r.status !== 'paid') out.push({ o, st, r }); });
+  });
+  return out.sort((a, b) => a.r.due.localeCompare(b.r.due));
+}
+const remindedOn = (o, n) => (o.reminders || {})[n] || '';
+
+/* ------------------------------------------------------------ messages */
+function dueText(r) {
+  const td = today();
+  if (r.due < td) return fmtShort(r.due) + ' se pending hai';
+  if (r.due === td) return 'aaj (' + fmtShort(r.due) + ') due hai';
+  return fmtShort(r.due) + ' ko due hai';
+}
+function msgReminder(o, r) {
+  const st = settings(), c = clientOf(o), s = orderState(o);
+  const balanceAfter = R(Math.max(0, s.balance - r.pending));
+  return fill(st.templates.reminder, { name: c.name, service: orderService(o), inst: r.n === 0 ? '(advance)' : r.label.replace('EMI ', ''), amount: inr(r.pending),
+    dueText: dueText(r), orderNo: o.orderNo, balanceAfter: inr(balanceAfter), upi: st.upiId || '—', business: st.business });
+}
+function nextLine(s) { return s.next ? 'Agli kisht: ₹' + inr(s.next.pending) + ' — ' + fmtDay(s.next.due) : 'Poora payment ho gaya ✅'; }
+function msgReceipt(p) {
+  const st = settings(), o = get('Orders', p.orderId), c = get('Clients', p.clientId) || { name: '' }, s = orderState(o);
+  return fill(st.templates.receipt, { name: c.name, amount: inr(p.amount), method: p.method, date: fmtDay(p.date), orderNo: o.orderNo, balance: inr(s.balance), nextLine: nextLine(s), business: st.business });
+}
+function msgInvoice(o, invNo) {
+  const st = settings(), c = clientOf(o), s = orderState(o);
+  return fill(st.templates.invoice, { name: c.name, invoiceNo: invNo, total: inr(s.total), paid: inr(s.paid), balance: inr(s.balance), nextLine: nextLine(s), upi: st.upiId || '—', business: st.business });
+}
+function planText(o) {
+  const rows = buildSchedule(o);
+  if ((o.plan || {}).mode !== 'emi') return 'Payment: Full payment';
+  const adv = rows.find(r => r.n === 0);
+  const ems = rows.filter(r => r.n > 0);
+  let t = 'Payment plan (0% EMI):\n';
+  if (adv) t += '• Advance: ₹' + inr(adv.amount) + '\n';
+  if (ems.length) {
+    const same = ems.every(r => r.amount === ems[0].amount);
+    t += same ? '• ' + ems.length + ' × ₹' + inr(ems[0].amount) + ' — har mahine 1 tarikh, ' + fmtShort(ems[0].due) + ' se'
+      : '• ' + (ems.length - 1) + ' × ₹' + inr(ems[0].amount) + ' + last ₹' + inr(ems[ems.length - 1].amount) + ' — har mahine 1 tarikh, ' + fmtShort(ems[0].due) + ' se';
+  }
+  return t;
+}
+function msgQuote(o) {
+  const st = settings(), c = clientOf(o), t = orderTotals(o);
+  const items = (o.items || []).filter(i => P(i.qty) > 0).map(i => '• ' + i.name + (P(i.qty) > 1 ? ' × ' + i.qty : '') + ' — ₹' + inr(P(i.price) * P(i.qty))).join('\n');
+  let disc = '';
+  if (t.combo) disc += 'Combo discount: −₹' + inr(t.combo) + '\n';
+  if (t.extra) disc += 'Discount: −₹' + inr(t.extra) + '\n';
+  return fill(st.templates.quote, { name: c.name, orderNo: o.orderNo, items, discountLine: disc, total: inr(t.total), planText: planText(o), business: st.business });
+}
+function msgSupport(o) {
+  const st = settings(), c = clientOf(o);
+  return fill(st.templates.support, { name: c.name, service: orderService(o), supportDate: fmtDay(o.supportUntil), fee: inr(st.supportFee), business: st.business });
+}
+function openWA(phone, text) {
+  if (!digits(phone)) { toast('Client ka WhatsApp number nahi hai'); return; }
+  window.open(waLink(phone, text), '_blank', 'noopener');
+}
+
+/* ------------------------------------------------------------ PDF: invoice & receipt */
+let fontsReady = false;
+function newDoc() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  doc.addFileToVFS('dejavu.ttf', window.__FONT_DEJAVU); doc.addFont('dejavu.ttf', 'DV', 'normal');
+  doc.addFileToVFS('dejavu-b.ttf', window.__FONT_DEJAVU_BOLD); doc.addFont('dejavu-b.ttf', 'DV', 'bold');
+  doc.setFont('DV', 'normal'); fontsReady = true;
+  return doc;
+}
+function drawQR(doc, text, x, y, size) {
+  const q = qrcode(0, 'M'); q.addData(text); q.make();
+  const n = q.getModuleCount(), cell = size / n;
+  doc.setFillColor(255, 255, 255); doc.rect(x - 2, y - 2, size + 4, size + 4, 'F');
+  doc.setFillColor(7, 20, 38);
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) doc.rect(x + c * cell, y + r * cell, cell + 0.02, cell + 0.02, 'F');
+}
+const upiLink = (amount, note) => { const st = settings(); return 'upi://pay?pa=' + encodeURIComponent(st.upiId).replace(/%40/g, '@') + '&pn=' + encodeURIComponent(st.upiName || st.business) + (amount > 0 ? '&am=' + R(amount).toFixed(2) : '') + '&cu=INR&tn=' + encodeURIComponent(note); };
+
+function pdfHeader(doc, title, no, date) {
+  const st = settings();
+  doc.setFillColor(7, 20, 38); doc.rect(0, 0, 210, 38, 'F');
+  doc.setFillColor(215, 168, 61); doc.rect(0, 38, 210, 1.2, 'F');
+  doc.setFont('DV', 'bold'); doc.setFontSize(18); doc.setTextColor(241, 210, 122); doc.text(st.business, 14, 17);
+  doc.setFont('DV', 'normal'); doc.setFontSize(8.5); doc.setTextColor(200, 212, 228); doc.text(st.tagline, 14, 23);
+  const contact = [fmtPhone(st.phone), st.email].filter(Boolean).join('  •  ');
+  doc.text(contact, 14, 28.5);
+  if (st.address) doc.text(doc.splitTextToSize(st.address, 110)[0], 14, 33.5);
+  doc.setFont('DV', 'bold'); doc.setFontSize(15); doc.setTextColor(255, 255, 255); doc.text(title, 196, 16, { align: 'right' });
+  doc.setFont('DV', 'normal'); doc.setFontSize(9); doc.setTextColor(200, 212, 228);
+  doc.text('No: ' + no, 196, 23, { align: 'right' }); doc.text('Date: ' + fmtDay(date), 196, 28.5, { align: 'right' });
+}
+function pdfBillTo(doc, c, o, y) {
+  doc.setTextColor(110, 122, 140); doc.setFontSize(8.5); doc.setFont('DV', 'bold'); doc.text('BILL TO', 14, y);
+  doc.text('ORDER', 130, y);
+  doc.setTextColor(20, 30, 45); doc.setFontSize(11); doc.text(c.name || '', 14, y + 6);
+  doc.setFont('DV', 'normal'); doc.setFontSize(9.5);
+  let yy = y + 11;
+  if (c.business) { doc.text(c.business, 14, yy); yy += 5; }
+  if (c.phone) { doc.text(fmtPhone(c.phone), 14, yy); yy += 5; }
+  if (c.city) { doc.text(doc.splitTextToSize(c.city, 100)[0], 14, yy); yy += 5; }
+  doc.text(o.orderNo + '  •  ' + fmtDay(o.date), 130, y + 6);
+  doc.text('Payment: ' + ((o.plan || {}).mode === 'emi' ? 'EMI (0% interest)' : 'Full payment'), 130, y + 11);
+  return Math.max(yy, y + 16) + 4;
+}
+function pdfFooter(doc, line) {
+  const st = settings();
+  doc.setDrawColor(225, 230, 238); doc.line(14, 276, 196, 276);
+  doc.setFontSize(8.5); doc.setTextColor(110, 122, 140);
+  doc.text(line, 14, 281);
+  doc.text('Thank you for choosing ' + st.business + '!', 196, 281, { align: 'right' });
+  doc.text('This is a computer-generated document. No GST charged.', 14, 286);
+}
+
+function buildInvoicePDF(o, invNo, invDate) {
+  const doc = newDoc(), st = settings(), c = clientOf(o), s = orderState(o);
+  pdfHeader(doc, 'INVOICE', invNo, invDate);
+  let y = pdfBillTo(doc, c, o, 50);
+  // items
+  doc.setFillColor(241, 244, 249); doc.rect(14, y, 182, 8, 'F');
+  doc.setFont('DV', 'bold'); doc.setFontSize(9); doc.setTextColor(60, 72, 90);
+  doc.text('Description', 17, y + 5.4); doc.text('Qty', 130, y + 5.4, { align: 'right' }); doc.text('Rate', 160, y + 5.4, { align: 'right' }); doc.text('Amount', 193, y + 5.4, { align: 'right' });
+  y += 8; doc.setFont('DV', 'normal'); doc.setTextColor(20, 30, 45); doc.setFontSize(9.5);
+  (o.items || []).filter(i => P(i.qty) > 0).forEach(i => {
+    const lines = doc.splitTextToSize(i.name + (i.note ? ' — ' + i.note : ''), 100);
+    doc.text(lines, 17, y + 6);
+    doc.text(String(i.qty), 130, y + 6, { align: 'right' }); doc.text(rs(i.price), 160, y + 6, { align: 'right' }); doc.text(rs(P(i.price) * P(i.qty)), 193, y + 6, { align: 'right' });
+    y += 4 + lines.length * 4.6; doc.setDrawColor(230, 234, 240); doc.line(14, y + 1, 196, y + 1); y += 1;
+  });
+  // totals
+  y += 4;
+  const tl = (label, val, bold, color) => { doc.setFont('DV', bold ? 'bold' : 'normal'); doc.setFontSize(bold ? 11 : 9.5); doc.setTextColor(...(color || [20, 30, 45])); doc.text(label, 150, y, { align: 'right' }); doc.text(val, 193, y, { align: 'right' }); y += bold ? 7 : 5.5; };
+  tl('Subtotal', rs(s.subtotal));
+  if (s.combo) tl('Combo discount', '– ' + rs(s.combo), false, [22, 140, 70]);
+  if (s.extra) tl('Discount', '– ' + rs(s.extra), false, [22, 140, 70]);
+  tl('Total', rs(s.total), true);
+  tl('Paid', rs(s.paid), false, [22, 140, 70]);
+  tl('Balance due', rs(s.balance), true, s.balance > 0 ? [190, 60, 60] : [22, 140, 70]);
+  // schedule
+  if ((o.plan || {}).mode === 'emi') {
+    y += 3; doc.setFont('DV', 'bold'); doc.setFontSize(10); doc.setTextColor(20, 30, 45); doc.text('Payment plan — 0% interest EMI', 14, y); y += 3;
+    doc.setFillColor(241, 244, 249); doc.rect(14, y, 120, 7, 'F'); doc.setFontSize(8.5); doc.setTextColor(60, 72, 90);
+    doc.text('Instalment', 17, y + 4.8); doc.text('Due date', 62, y + 4.8); doc.text('Amount', 100, y + 4.8, { align: 'right' }); doc.text('Status', 104, y + 4.8);
+    y += 7; doc.setFont('DV', 'normal');
+    s.rows.forEach(r => {
+      if (y > 262) return;
+      doc.setTextColor(20, 30, 45); doc.text(r.label, 17, y + 4.6); doc.text(fmtDay(r.due), 62, y + 4.6); doc.text(rs(r.amount), 100, y + 4.6, { align: 'right' });
+      const col = r.status === 'paid' ? [22, 140, 70] : r.status === 'overdue' ? [190, 60, 60] : [120, 130, 145];
+      doc.setTextColor(...col); doc.text({ paid: 'Paid', partial: 'Part paid', overdue: 'Overdue', due: 'Due today', upcoming: 'Upcoming' }[r.status] + (r.status !== 'paid' && r.paid > 0 ? ' · ' + rs(r.pending) + ' left' : ''), 104, y + 4.6);
+      y += 6;
+    });
+  }
+  // UPI box
+  if (st.upiId && s.balance > 0) {
+    const payNow = s.next ? s.next.pending : s.balance;
+    const bx = 146, by = (o.plan || {}).mode === 'emi' ? Math.min(Math.max(y - 6 * s.rows.length - 10, 150), 210) : Math.max(y + 4, 150);
+    doc.setDrawColor(215, 168, 61); doc.setLineWidth(0.4); doc.roundedRect(bx, by, 50, 62, 3, 3, 'S');
+    drawQR(doc, upiLink(payNow, o.orderNo), bx + 9, by + 5, 32);
+    doc.setFont('DV', 'bold'); doc.setFontSize(9); doc.setTextColor(20, 30, 45); doc.text('Scan to pay ' + rs(payNow), bx + 25, by + 46, { align: 'center' });
+    doc.setFont('DV', 'normal'); doc.setFontSize(7.5); doc.setTextColor(90, 100, 115); doc.text(doc.splitTextToSize('UPI: ' + st.upiId, 46), bx + 25, by + 51, { align: 'center' });
+  }
+  pdfFooter(doc, (o.plan || {}).mode === 'emi' ? 'EMI is interest-free. Instalments are due on the 1st of every month.' : 'Payment due on order confirmation.');
+  return doc;
+}
+
+function buildReceiptPDF(p, recNo) {
+  const doc = newDoc(), st = settings(), o = get('Orders', p.orderId), c = clientOf(o), s = orderState(o);
+  pdfHeader(doc, 'PAYMENT RECEIPT', recNo, p.date);
+  let y = pdfBillTo(doc, c, o, 50);
+  doc.setFillColor(236, 250, 242); doc.roundedRect(14, y, 182, 26, 3, 3, 'F');
+  doc.setFont('DV', 'normal'); doc.setFontSize(10); doc.setTextColor(22, 110, 60); doc.text('Amount received', 20, y + 9);
+  doc.setFont('DV', 'bold'); doc.setFontSize(20); doc.text(rs(p.amount), 20, y + 20);
+  doc.setFont('DV', 'normal'); doc.setFontSize(9.5); doc.setTextColor(20, 30, 45);
+  doc.text('Method: ' + p.method, 120, y + 9); if (p.reference) doc.text('Ref: ' + p.reference, 120, y + 15); doc.text('Date: ' + fmtDay(p.date), 120, y + (p.reference ? 21 : 15));
+  y += 36;
+  const tl = (label, val, bold) => { doc.setFont('DV', bold ? 'bold' : 'normal'); doc.setFontSize(bold ? 11 : 10); doc.setTextColor(20, 30, 45); const lines = doc.splitTextToSize(val, 76); doc.text(label, 14, y); doc.text(lines, 120, y); y += 7 + (lines.length - 1) * 4.6; };
+  tl('For', orderService(o));
+  tl('Order total', rs(s.total));
+  tl('Total paid so far', rs(s.paid));
+  tl('Balance due', rs(s.balance), true);
+  if (s.next) tl('Next instalment', rs(s.next.pending) + ' on ' + fmtDay(s.next.due));
+  pdfFooter(doc, 'Received with thanks.');
+  return doc;
+}
+
+async function sharePDF(doc, filename, phone, text) {
+  const blob = doc.output('blob');
+  const file = new File([blob], filename, { type: 'application/pdf' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: filename, text }); return 'shared'; }
+    catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  if (phone) openWA(phone, text + '\n\n(PDF attach kar raha hoon)');
+  toast('PDF download ho gaya — WhatsApp chat mein attach kar do', 4200);
+  return 'downloaded';
+}
+const safeName = s => String(s).replace(/[^\w.-]+/g, '_');
+
+async function invoiceFor(o) {
+  let inv = live('Invoices').find(i => i.kind === 'invoice' && i.orderId === o.id);
+  if (!inv) { inv = { id: uid(), kind: 'invoice', invoiceNo: nextNumber('invoice'), orderId: o.id, clientId: o.clientId, date: today() }; await saveOne('Invoices', inv, true); }
+  return inv;
+}
+async function sendInvoice(o) {
+  if (!settings().upiId) toast('Tip: More → Business details mein UPI ID daaloge toh invoice pe QR aayega', 3500);
+  const inv = await invoiceFor(o);
+  const doc = buildInvoicePDF(o, inv.invoiceNo, inv.date);
+  await sharePDF(doc, safeName(inv.invoiceNo) + '.pdf', clientOf(o).phone, msgInvoice(o, inv.invoiceNo));
+}
+async function receiptFor(p) {
+  let rec = live('Invoices').find(i => i.kind === 'receipt' && i.paymentId === p.id);
+  if (!rec) { rec = { id: uid(), kind: 'receipt', invoiceNo: nextNumber('receipt'), orderId: p.orderId, clientId: p.clientId, paymentId: p.id, date: p.date, amount: p.amount }; await saveOne('Invoices', rec, true); }
+  else if (P(rec.amount) !== P(p.amount) || rec.date !== p.date) { rec.amount = p.amount; rec.date = p.date; await saveOne('Invoices', rec); }
+  return rec;
+}
+async function sendReceipt(p) {
+  const rec = await receiptFor(p);
+  const doc = buildReceiptPDF(p, rec.invoiceNo);
+  await sharePDF(doc, safeName(rec.invoiceNo) + '.pdf', (get('Clients', p.clientId) || {}).phone, msgReceipt(p));
+}
+
+/* ------------------------------------------------------------ sync with Google Sheet */
+const VIEW = {
+  Clients: r => ({ name: r.name, business: r.business, phone: r.phone, city: r.city, createdAt: r.createdAt }),
+  Orders: r => { const t = orderTotals(r); return { orderNo: r.orderNo, date: r.date, clientName: (get('Clients', r.clientId) || {}).name || '', packages: orderService(r), total: t.total, paymentMode: (r.plan || {}).mode === 'emi' ? 'EMI' : 'Full', downPayment: (r.plan || {}).mode === 'emi' ? P(r.plan.down) : '', emiMonths: (r.plan || {}).mode === 'emi' ? P(r.plan.months) : '', stage: r.stage }; },
+  Payments: r => ({ date: r.date, orderNo: (get('Orders', r.orderId) || {}).orderNo || '', clientName: (get('Clients', r.clientId) || {}).name || '', amount: r.amount, method: r.method, reference: r.reference }),
+  Invoices: r => ({ invoiceNo: r.invoiceNo, kind: r.kind, date: r.date, orderNo: (get('Orders', r.orderId) || {}).orderNo || '', clientName: (get('Clients', r.clientId) || {}).name || '', amount: r.kind === 'receipt' ? r.amount : orderTotals(get('Orders', r.orderId) || {}).total }),
+  Settings: r => ({ key: r.key || r.id })
+};
+let syncTimer = null, syncing = false, syncAgain = false;
+function scheduleSync(ms = 1500) { if (!S.url) return; clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, ms); }
+async function api(action, payload, url, key) {
+  url = url || S.url; key = key || S.key;
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 45000);
+  try {
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, key }, payload || {})), redirect: 'follow', signal: ctl.signal });
+    let j; try { j = await res.json(); } catch (e) { throw new Error('Sheet ne sahi jawab nahi diya — Apps Script URL check karo'); }
+    if (!j.ok) throw new Error(j.error === 'BAD_KEY' ? 'Secret key Sheet se match nahi karti' : (j.message || j.error || 'Sheet error'));
+    return j;
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('Sheet ne bahut der lagayi — dobara try karo');
+    if (e instanceof TypeError) throw new Error(navigator.onLine ? 'Sheet tak nahi pahunch paaye — URL /exec pe khatam hona chahiye aur access "Anyone" hona chahiye' : 'Internet nahi hai');
+    throw e;
+  } finally { clearTimeout(tm); }
+}
+const isNewer = (a, b) => (P(a.rev) > P(b.rev)) || (P(a.rev) === P(b.rev) && String(a.updatedAt) > String(b.updatedAt));
+async function syncNow() {
+  if (!S.url) { updateChip(); return; }
+  if (syncing) { syncAgain = true; return; }
+  if (!navigator.onLine) { S.sync = { state: 'off', msg: 'Offline' }; updateChip(); return; }
+  syncing = true; S.sync = { state: 'busy', msg: '' }; updateChip();
+  let changed = false;
+  try {
+    let keys = [...S.outbox];
+    while (keys.length) {
+      const batch = keys.splice(0, 100); const sent = new Map(), records = [];
+      batch.forEach(k => {
+        const t = k.slice(0, k.indexOf('|')), id = k.slice(k.indexOf('|') + 1), r = S.t[t] && S.t[t].get(id);
+        if (!r) { S.outbox.delete(k); return; }
+        sent.set(k, r.rev + '@' + r.updatedAt); records.push({ t, r, v: VIEW[t](r) });
+      });
+      if (!records.length) continue;
+      const j = await api('push', { records });
+      const writes = [];
+      for (const res of j.results) {
+        const k = res.t + '|' + res.id, local = S.t[res.t].get(res.id);
+        const unchanged = local && (local.rev + '@' + local.updatedAt) === sent.get(k);
+        if (res.status === 'ok') { if (local) { local.serverUpdatedAt = res.serverUpdatedAt; writes.push([res.t, local]); } if (unchanged) S.outbox.delete(k); }
+        else if (res.status === 'stale' && res.server) { S.t[res.t].set(res.server.id, res.server); writes.push([res.t, res.server]); S.outbox.delete(k); changed = true; }
+      }
+      await putRecs(writes); await saveOutbox();
+    }
+    const j = await api('pull', { since: S.cursor });
+    const writes = [];
+    for (const t of Object.keys(j.rows || {})) {
+      if (!S.t[t]) continue;
+      for (const r of j.rows[t]) {
+        if (S.outbox.has(t + '|' + r.id)) continue;
+        const cur = S.t[t].get(r.id);
+        if (!cur || isNewer(r, cur)) { S.t[t].set(r.id, r); writes.push([t, r]); changed = true; }
+      }
+    }
+    await putRecs(writes);
+    S.cursor = Number(j.cursor) || S.cursor; await saveMeta('cursor', S.cursor);
+    S.lastSync = Date.now(); await saveMeta('lastSync', S.lastSync);
+    S.sync = { state: S.outbox.size ? 'pending' : 'ok', msg: '' };
+  } catch (e) {
+    S.sync = { state: 'err', msg: e.message };
+  } finally {
+    syncing = false; updateChip();
+    if (changed && S.unlocked) render();
+    if (syncAgain) { syncAgain = false; scheduleSync(300); }
+  }
+}
+async function syncIfPossible() { if (S.url && navigator.onLine) { try { await syncNow(); } catch (e) { /* stays local */ } } }
+function updateChip() {
+  const c = $('#syncChip'); if (!c) return;
+  let cls = 'off', txt = 'Local';
+  if (S.url) {
+    const st = S.sync.state;
+    if (st === 'busy') { cls = 'busy'; txt = 'Syncing'; }
+    else if (st === 'err') { cls = 'err'; txt = 'Sync error'; }
+    else if (S.outbox.size) { cls = 'pending'; txt = S.outbox.size + ' pending'; }
+    else if (st === 'off') { cls = 'off'; txt = 'Offline'; }
+    else { cls = 'ok'; txt = 'Synced'; }
+  }
+  c.className = 'chip ' + cls; c.querySelector('span').textContent = txt;
+}
+
+/* ------------------------------------------------------------ PIN lock */
+async function hashPin(pin, salt) {
+  const data = new TextEncoder().encode(salt + ':' + pin + ':itw-manager');
+  const h = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function showLock() {
+  S.unlocked = false;
+  const L = $('#lock'); L.classList.remove('hide');
+  if (!S.me) { renderSetup(L); return; }
+  let pin = '';
+  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>Hi ' + esc(S.me.name) + ', PIN daalo</p><div class="dots" id="dots"></div><div class="err" id="perr"></div>' +
+    '<div class="pad">' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '⌫'].map(k => '<button type="button" data-k="' + k + '">' + k + '</button>').join('') + '</div>';
+  const len = S.me.pinLen || 4;
+  const draw = () => { $('#dots').innerHTML = Array.from({ length: len }, (_, i) => '<i class="' + (i < pin.length ? 'f' : '') + '"></i>').join(''); };
+  draw();
+  const press = async k => {
+    if (k === 'C') pin = ''; else if (k === '⌫') pin = pin.slice(0, -1); else if (pin.length < len) pin += k;
+    draw();
+    if (pin.length === len) {
+      if (await hashPin(pin, S.me.salt) === S.me.pinHash) { L.classList.add('hide'); L.innerHTML = ''; S.unlocked = true; document.removeEventListener('keydown', kb); render(); scheduleSync(200); }
+      else { $('#perr').textContent = 'Galat PIN — dobara try karo'; pin = ''; setTimeout(draw, 150); }
+    }
+  };
+  const kb = e => { if (/^\d$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('⌫'); };
+  document.addEventListener('keydown', kb);
+  L.onclick = e => { const b = e.target.closest('button[data-k]'); if (b) press(b.dataset.k); };
+}
+function renderSetup(L) {
+  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>Pehli baar setup — 30 second</p>' +
+    '<form id="setupForm"><label class="f"><span>Aapka naam</span><input class="i" name="name" required maxlength="30" placeholder="e.g. Abu"></label>' +
+    '<label class="f"><span>4 ya 6 digit PIN</span><input class="i" name="pin" required inputmode="numeric" pattern="\\d{4}|\\d{6}" maxlength="6" type="password" placeholder="••••"></label>' +
+    '<label class="f"><span>PIN dobara</span><input class="i" name="pin2" required inputmode="numeric" maxlength="6" type="password" placeholder="••••"></label>' +
+    '<div class="err" id="serr"></div><button class="btn gold block" type="submit">Shuru karo</button>' +
+    '<p class="tiny" style="margin-top:12px">Data isi phone mein save hota hai. Google Sheet sync baad mein More → Sync se jod sakte ho.</p></form>';
+  $('#setupForm').onsubmit = async e => {
+    e.preventDefault(); const f = new FormData(e.target);
+    const name = String(f.get('name')).trim(), pin = String(f.get('pin')), pin2 = String(f.get('pin2'));
+    if (!name) return; if (!/^(\d{4}|\d{6})$/.test(pin)) { $('#serr').textContent = 'PIN 4 ya 6 digit ka hona chahiye'; return; }
+    if (pin !== pin2) { $('#serr').textContent = 'Dono PIN match nahi kar rahe'; return; }
+    const salt = uid(); S.me = { name, salt, pinHash: await hashPin(pin, salt), pinLen: pin.length };
+    await saveMeta('profile', S.me);
+    L.classList.add('hide'); L.innerHTML = ''; S.unlocked = true; location.hash = '#more/business'; render();
+    toast('Setup ho gaya! Pehle apni business details aur UPI ID bhar do', 4000);
+  };
+}
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) hiddenAt = Date.now();
+  else if (S.me && S.unlocked && hiddenAt && Date.now() - hiddenAt > 5 * 60 * 1000) showLock();
+  else if (!document.hidden && S.unlocked) scheduleSync(300);
+});
+
+/* ------------------------------------------------------------ sheet (modal) */
+function sheet(title, html, onReady) {
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = '<div class="sheet" role="dialog" aria-modal="true"><h3><span>' + esc(title) + '</span><button type="button" data-close aria-label="Close">×</button></h3>' + html + '</div>';
+  document.body.appendChild(bg);
+  const close = () => bg.remove();
+  bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-close]')) close(); });
+  if (onReady) onReady(bg.querySelector('.sheet'), close);
+  return close;
+}
+function confirmBox(text, okText = 'Haan', danger = false) {
+  return new Promise(res => {
+    let done = false;
+    sheet('Confirm', '<p style="margin:0 0 16px">' + esc(text) + '</p><div class="btns grid2"><button class="btn" data-close type="button">Nahi</button><button class="btn ' + (danger ? 'red' : 'gold') + '" id="cfOk" type="button">' + esc(okText) + '</button></div>', (el, close) => {
+      $('#cfOk', el).onclick = () => { done = true; close(); res(true); };
+      el.parentElement.addEventListener('click', () => setTimeout(() => { if (!done && !document.body.contains(el)) res(false); }, 0));
+    });
+  });
+}
+
+/* ------------------------------------------------------------ router */
+const view = () => $('#view');
+function setTitle(t, back) { $('#title').textContent = t; $('#backBtn').classList.toggle('hide', !back); }
+$('#backBtn').onclick = () => history.length > 1 ? history.back() : (location.hash = '#home');
+$('#syncChip').onclick = () => { if (!S.url) location.hash = '#more/sync'; else { if (S.sync.state === 'err') toast(S.sync.msg, 4500); syncNow(); } };
+window.addEventListener('hashchange', () => { if (S.unlocked) render(); });
+function render() {
+  const h = decodeURIComponent(location.hash.slice(1)) || 'home';
+  const [page, a, b] = h.split('/');
+  $$('.nav a').forEach(x => x.classList.toggle('on', x.dataset.nav === page || (page === 'order' && x.dataset.nav === 'orders') || (page === 'client' && x.dataset.nav === 'clients')));
+  window.scrollTo(0, 0);
+  const pages = { home: renderHome, orders: renderOrders, order: () => renderOrder(a), new: () => renderNew(a), clients: renderClients, client: () => renderClient(a), payments: renderPayments, more: () => renderMore(a) };
+  (pages[page] || renderHome)(a, b);
+  updateChip();
+}
+
+/* ------------------------------------------------------------ HOME */
+function renderHome() {
+  setTitle('Izyan Tech Manager', false);
+  const td = today(), st = settings(), ym = td.slice(0, 7);
+  const monthPaid = R(live('Payments').filter(p => String(p.date).startsWith(ym)).reduce((s, p) => s + P(p.amount), 0));
+  const orders = live('Orders').filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry');
+  let outstanding = 0; orders.forEach(o => { outstanding += orderState(o).balance; });
+  const dues = allDues();
+  const late = dues.filter(d => d.r.due <= td);
+  const overdueAmt = R(late.reduce((s, d) => s + d.r.pending, 0));
+  const soon = dues.filter(d => d.r.due > td && d.r.due <= addDays(td, 7));
+  const active = live('Orders').filter(o => ACTIVE_STAGES.includes(o.stage));
+  const enquiries = live('Orders').filter(o => o.stage === 'Enquiry');
+  const renewals = live('Orders').filter(o => o.stage === 'Live' && o.supportUntil && !o.supportRenewed && o.supportUntil <= addDays(td, 30)).sort((a, b) => a.supportUntil.localeCompare(b.supportUntil));
+  const unsent = late.filter(d => remindedOn(d.o, d.r.n) !== td).length;
+  let html = '';
+  if (!st.upiId) html += '<a class="banner" style="display:block;text-decoration:none;color:inherit" href="#more/business">⚙️ Business details aur UPI ID abhi baaki hain — invoice pe QR ke liye zaroori. Yahan tap karo.</a>';
+  if (parseDay(td).getDate() === 1 && late.length) html += '<div class="banner">📅 Aaj 1 tarikh hai — ' + late.length + ' EMI reminder' + (late.length > 1 ? 's' : '') + ' bhejne hain' + (unsent < late.length ? ' (' + (late.length - unsent) + ' bhej diye)' : '') + '.</div>';
+  html += '<div class="kpis"><div class="kpi green"><small>Is mahine collection</small><b>' + rs(monthPaid) + '</b></div><div class="kpi gold"><small>Total baaki (outstanding)</small><b>' + rs(outstanding) + '</b></div>' +
+    '<div class="kpi red"><small>Due / overdue abhi</small><b>' + rs(overdueAmt) + '</b></div><div class="kpi"><small>Chal rahe orders</small><b>' + active.length + '</b></div></div>';
+  html += '<div class="card"><h2>🔔 Reminders — aaj tak due <span class="cnt">' + late.length + '</span></h2>' + (late.length ? '<div class="list">' + late.map(dueRow).join('') + '</div>' : '<div class="empty">Koi payment due nahi hai 🎉</div>') + '</div>';
+  html += '<div class="card"><h2>🗓️ Agle 7 din <span class="cnt">' + soon.length + '</span></h2>' + (soon.length ? '<div class="list">' + soon.map(dueRow).join('') + '</div>' : '<div class="empty">Agle 7 din mein koi EMI nahi.</div>') + '</div>';
+  if (renewals.length) html += '<div class="card"><h2>🛠️ Support renewals <span class="cnt">' + renewals.length + '</span></h2><div class="list">' + renewals.map(o => { const c = clientOf(o); const past = o.supportUntil < td; return '<div class="row"><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(orderService(o)) + ' • support ' + (past ? 'khatam: ' : 'till ') + fmtDay(o.supportUntil) + '</small></div><button class="btn sm green wa" data-act="waSupport" data-id="' + o.id + '">' + WA_ICON + 'Remind</button></div>'; }).join('') + '</div></div>';
+  html += '<div class="card"><h2>🚧 Orders in progress <span class="cnt">' + active.length + '</span></h2>' + (active.length ? '<div class="list">' + active.map(orderRow).join('') + '</div>' : '<div class="empty">Abhi koi order chal nahi raha.</div>') + '</div>';
+  if (enquiries.length) html += '<div class="card"><h2>💬 Enquiries <span class="cnt">' + enquiries.length + '</span></h2><div class="list">' + enquiries.map(orderRow).join('') + '</div></div>';
+  html += '<a class="btn block" href="#payments" style="margin-top:4px">📒 Saare payments dekho</a>';
+  view().innerHTML = html;
+}
+function dueRow(d) {
+  const c = clientOf(d.o), sent = remindedOn(d.o, d.r.n);
+  return '<div class="row"><a class="main" href="#order/' + d.o.id + '" style="color:inherit;text-decoration:none"><b>' + esc(c.name) + '</b><small>' + esc(d.o.orderNo) + ' • ' + esc(d.r.label) + ' • ' + fmtShort(d.r.due) + ' ' + statusBadge(d.r.status) + (sent ? ' <span class="badge b-paid">Sent ' + fmtShort(sent) + '</span>' : '') + '</small></a>' +
+    '<div class="amt">' + rs(d.r.pending) + '<div class="btns" style="margin-top:6px;justify-content:flex-end"><button class="btn sm green wa" data-act="waRemind" data-id="' + d.o.id + '" data-n="' + d.r.n + '">' + WA_ICON + 'Remind</button><button class="btn sm gold" data-act="pay" data-id="' + d.o.id + '" data-amt="' + d.r.pending + '">₹ Paid</button></div></div></div>';
+}
+function orderRow(o) {
+  const c = clientOf(o), s = orderState(o);
+  return '<a class="row" href="#order/' + o.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(o.orderNo) + ' • ' + esc(orderService(o)) + '</small><small>' + stageBadge(o.stage) + '</small></div><div class="amt">' + rs(s.total) + (s.balance > 0 && o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="red-t">Baaki ' + rs(s.balance) + '</small>' : o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="green-t">Fully paid</small>' : '') + '</div></a>';
+}
+
+/* ------------------------------------------------------------ ORDERS */
+let orderFilter = 'Active';
+function renderOrders() {
+  setTitle('Orders', false);
+  const filters = ['Active', 'Enquiry', 'Live', 'Dues', 'All', 'Cancelled'];
+  const q = (renderOrders.q || '').toLowerCase();
+  let list = live('Orders').sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+  if (orderFilter === 'Active') list = list.filter(o => ACTIVE_STAGES.includes(o.stage));
+  else if (orderFilter === 'Dues') list = list.filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry' && orderState(o).balance > 0);
+  else if (orderFilter !== 'All') list = list.filter(o => o.stage === orderFilter);
+  if (q) list = list.filter(o => (o.orderNo + ' ' + clientOf(o).name + ' ' + clientOf(o).business + ' ' + orderService(o)).toLowerCase().includes(q));
+  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="oq" placeholder="Order, client ya package dhoondo" value="' + esc(renderOrders.q || '') + '"></div>' +
+    '<div class="seg">' + filters.map(f => '<button data-of="' + f + '" class="' + (f === orderFilter ? 'on' : '') + '">' + f + '</button>').join('') + '</div>' +
+    '<div class="card list">' + (list.length ? list.map(orderRow).join('') : '<div class="empty">Koi order nahi mila. Neeche “New” se naya order banao.</div>') + '</div>';
+  $('#oq').oninput = e => { renderOrders.q = e.target.value; const pos = e.target.selectionStart; renderOrders(); const i = $('#oq'); i.focus(); i.setSelectionRange(pos, pos); };
+  $$('[data-of]').forEach(b => b.onclick = () => { orderFilter = b.dataset.of; renderOrders(); });
+}
+
+function renderOrder(id) {
+  const o = get('Orders', id); if (!o) { view().innerHTML = '<div class="card empty">Order nahi mila.</div>'; setTitle('Order', true); return; }
+  const c = clientOf(o), s = orderState(o), st = settings();
+  setTitle(o.orderNo, true);
+  const chk = checklistFor(o), done = o.checklist || {};
+  const nDone = chk.filter(k => done[k]).length;
+  const pays = orderPayments(o);
+  const stageIdx = STAGES.indexOf(o.stage);
+  let html = '<div class="card"><div class="hd"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><h3>' + esc(c.name) + '</h3><small>' + esc(c.business || '') + (c.business ? ' • ' : '') + esc(o.orderNo) + ' • ' + fmtDay(o.date) + '</small></div>' + stageBadge(o.stage) + '</div>' +
+    '<div class="btns grid2"><button class="btn green wa" data-act="waHello" data-id="' + c.id + '">' + WA_ICON + 'Message</button><a class="btn" href="#client/' + c.id + '">👤 Client</a></div></div>';
+  // stage flow
+  html += '<div class="card"><h2>Order flow</h2><div class="steps">' + STAGES.filter(x => x !== 'Cancelled').map((x, i) => '<button data-stage="' + esc(x) + '" class="' + (x === o.stage ? 'cur' : (o.stage !== 'Cancelled' && i < stageIdx ? 'done' : '')) + '">' + (o.stage !== 'Cancelled' && i < stageIdx ? '✓ ' : '') + esc(x) + '</button>').join('') + '</div>' +
+    (o.stage === 'Enquiry' ? '<div class="btns"><button class="btn green wa" data-act="waQuote" data-id="' + o.id + '">' + WA_ICON + 'Quotation bhejo</button><button class="btn gold" data-stage="Confirmed">✓ Confirm order</button></div>' : '') +
+    (o.stage === 'Live' && o.supportUntil ? '<p class="tiny" style="margin:8px 0 0">Live: ' + fmtDay(o.liveDate) + ' • Free support till <b>' + fmtDay(o.supportUntil) + '</b>' + (o.supportRenewed ? ' • renewed' : '') + '</p>' : '') +
+    (chk.length ? '<hr class="s"><h2 style="margin-bottom:4px">Checklist <span class="cnt">' + nDone + '/' + chk.length + '</span></h2><div class="pbar"><i style="width:' + (chk.length ? nDone / chk.length * 100 : 0) + '%"></i></div>' + chk.map(k => '<label class="chk"><input type="checkbox" data-chk="' + esc(k) + '"' + (done[k] ? ' checked' : '') + '><span>' + esc(k) + '</span></label>').join('') : '') + '</div>';
+  // items
+  html += '<div class="card"><h2>Packages</h2>' + (o.items || []).filter(i => P(i.qty) > 0).map(i => '<div class="row"><div class="main"><b>' + esc(i.name) + '</b>' + (i.note ? '<small>' + esc(i.note) + '</small>' : '') + '<small>' + i.qty + ' × ' + rs(i.price) + '</small></div><div class="amt">' + rs(P(i.qty) * P(i.price)) + '</div></div>').join('') +
+    '<div class="sum"><div><span>Subtotal</span><span>' + rs(s.subtotal) + '</span></div>' + (s.combo ? '<div class="green-t"><span>Combo discount</span><span>− ' + rs(s.combo) + '</span></div>' : '') + (s.extra ? '<div class="green-t"><span>Discount</span><span>− ' + rs(s.extra) + '</span></div>' : '') + '<div class="tot"><span>Total</span><span>' + rs(s.total) + '</span></div></div></div>';
+  // payments
+  if (o.stage !== 'Enquiry') {
+    html += '<div class="card"><h2>Payment ' + ((o.plan || {}).mode === 'emi' ? '— 0% EMI' : '— Full') + '</h2>' +
+      '<div class="pbar"><i style="width:' + (s.total ? Math.min(100, s.paid / s.total * 100) : 0) + '%"></i></div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="green-t">Paid ' + rs(s.paid) + '</span><span class="' + (s.balance > 0 ? 'red-t' : 'green-t') + '">Baaki ' + rs(s.balance) + '</span></div>' +
+      (s.extraPaid ? '<p class="tiny red-t">Note: ' + rs(s.extraPaid) + ' total se zyada aaya hai.</p>' : '') +
+      '<table class="sch" style="margin-top:10px"><thead><tr><th>Kisht</th><th>Due</th><th class="r">Amount</th><th>Status</th><th></th></tr></thead><tbody>' +
+      s.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtShort(r.due) + '</td><td class="r">' + rs(r.amount) + (r.paid > 0 && r.status !== 'paid' ? '<br><small class="muted">baaki ' + rs(r.pending) + '</small>' : '') + '</td><td>' + statusBadge(r.status) + (remindedOn(o, r.n) && r.status !== 'paid' ? '<br><small class="muted">sent ' + fmtShort(remindedOn(o, r.n)) + '</small>' : '') + '</td><td class="r">' + (r.status !== 'paid' && o.stage !== 'Cancelled' ? '<button class="btn sm green wa" data-act="waRemind" data-id="' + o.id + '" data-n="' + r.n + '" aria-label="WhatsApp reminder">' + WA_ICON + '</button>' : '') + '</td></tr>').join('') +
+      '</tbody></table><div class="btns grid2" style="margin-top:12px"><button class="btn gold" data-act="pay" data-id="' + o.id + '" data-amt="' + (s.next ? s.next.pending : 0) + '">₹ Payment add karo</button><button class="btn" data-act="invoice" data-id="' + o.id + '">🧾 Invoice PDF</button></div>' +
+      (pays.length ? '<hr class="s"><h2>Payments mile <span class="cnt">' + pays.length + '</span></h2><div class="list">' + pays.map(payRow).join('') + '</div>' : '') + '</div>';
+  }
+  if (o.notes) html += '<div class="card"><h2>Notes</h2><div style="white-space:pre-wrap;font-size:14px">' + esc(o.notes) + '</div></div>';
+  html += '<div class="btns grid2"><a class="btn" href="#new/' + o.id + '">✏️ Edit order</a>' + (o.stage === 'Cancelled' ? '<button class="btn red" data-act="delOrder" data-id="' + o.id + '">🗑 Delete</button>' : '<button class="btn red" data-stage="Cancelled">✕ Cancel order</button>') + '</div>';
+  if (o.stage === 'Live' && hasSupportable(o)) html += '<button class="btn block" style="margin-top:8px" data-act="renew" data-id="' + o.id + '">🛠️ Support renewal order banao (' + rs(st.supportFee) + ')</button>';
+  view().innerHTML = html;
+  $$('[data-stage]').forEach(b => b.onclick = () => setStage(o, b.dataset.stage));
+  $$('[data-chk]').forEach(cb => cb.onchange = async () => { const r = get('Orders', o.id); r.checklist = Object.assign({}, r.checklist || {}, { [cb.dataset.chk]: cb.checked }); await saveOne('Orders', r); renderOrder(o.id); });
+}
+async function setStage(o, stage) {
+  if (stage === o.stage) return;
+  if (stage === 'Cancelled' && !(await confirmBox('Ye order cancel karna hai? Iske reminders band ho jaayenge.', 'Cancel order', true))) return;
+  const r = get('Orders', o.id); r.stage = stage;
+  if (stage === 'Live' && !r.liveDate) { r.liveDate = today(); if (hasSupportable(r)) r.supportUntil = addYear(r.liveDate); }
+  await saveOne('Orders', r);
+  toast('Stage: ' + stage + (stage === 'Live' && r.supportUntil ? ' • support till ' + fmtDay(r.supportUntil) : ''));
+  renderOrder(o.id);
+}
+function payRow(p) {
+  const o = get('Orders', p.orderId), c = get('Clients', p.clientId) || { name: '' };
+  return '<div class="row"><div class="main"><b>' + rs(p.amount) + ' <span class="muted" style="font-weight:600;font-size:12.5px">• ' + esc(p.method) + '</span></b><small>' + fmtDay(p.date) + ' • ' + esc(c.name) + (o ? ' • ' + esc(o.orderNo) : '') + (p.reference ? ' • ' + esc(p.reference) : '') + '</small></div>' +
+    '<div class="btns"><button class="btn sm" data-act="receipt" data-id="' + p.id + '">🧾</button><button class="btn sm" data-act="editPay" data-id="' + p.id + '">✏️</button></div></div>';
+}
+
+/* ------------------------------------------------------------ NEW / EDIT ORDER */
+let draft = null;
+function renderNew(editId) {
+  const editing = editId ? get('Orders', editId) : null;
+  if (!draft || draft._for !== (editId || 'new')) {
+    draft = editing ? JSON.parse(JSON.stringify(editing)) : { id: uid(), orderNo: '', clientId: '', date: today(), stage: 'Confirmed', items: [], plan: { mode: 'full', down: 0, months: 6, start: firstOfNextMonth(today()) }, extraDiscount: 0, notes: '' };
+    draft._for = editId || 'new';
+    if (!editing && renderNew.preClient) { draft.clientId = renderNew.preClient; renderNew.preClient = null; }
+  }
+  setTitle(editing ? 'Edit ' + editing.orderNo : 'Naya order', !!editing);
+  const st = settings(), d = draft;
+  const clients = live('Clients').sort((a, b) => a.name.localeCompare(b.name));
+  const qtyOf = code => { const it = d.items.find(i => i.code === code); return it ? P(it.qty) : 0; };
+  const priceOf = (code, def) => { const it = d.items.find(i => i.code === code); return it ? P(it.price) : def; };
+  const groups = [['shop', '🛍️ QR Digital Shop'], ['billing', '🧾 Billing & Inventory App'], ['addon', '📸 Add-ons'], ['support', '🛠️ Support'], ['custom', '✦ Custom work (price daalo)']];
+  const t = orderTotals(d);
+  const sch = buildSchedule(d);
+  let html = '<div class="card"><h2>1. Client</h2><label class="f"><span>Client chuno</span><select class="i" id="nClient"><option value="">— Client select karo —</option>' + clients.map(c => '<option value="' + c.id + '"' + (c.id === d.clientId ? ' selected' : '') + '>' + esc(c.name) + (c.business ? ' — ' + esc(c.business) : '') + '</option>').join('') + '</select></label><button class="btn sm" type="button" id="nNewClient">＋ Naya client</button></div>';
+  html += '<div class="card"><h2>2. Packages</h2>' + groups.map(([g, label]) => {
+    const items = st.catalog.filter(c => c.group === g); if (!items.length) return '';
+    return '<div class="tiny" style="margin:6px 0;font-weight:700">' + label + '</div>' + items.map(c => {
+      const q = qtyOf(c.code), price = priceOf(c.code, c.price), multi = g === 'addon' || g === 'support' || g === 'custom';
+      if (g === 'shop' || g === 'billing') return '<div class="pk' + (q ? ' on' : '') + '" data-pick="' + c.code + '"><div class="main"><b>' + esc(c.name) + '</b><small>' + rs(c.price) + '</small></div><input type="radio" name="g_' + g + '"' + (q ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:#d7a83d"></div>';
+      return '<div class="pk' + (q ? ' on' : '') + '"><div class="main"><b>' + esc(c.name) + '</b><small>' + (c.unit ? 'per ' + esc(c.unit) : 'price apne hisaab se') + '</small></div><div class="qty"><button type="button" data-q="' + c.code + '" data-d="-1">−</button><b style="min-width:18px;text-align:center">' + q + '</b><button type="button" data-q="' + c.code + '" data-d="1">+</button>' + (multi ? '<input type="number" inputmode="numeric" min="0" step="1" data-p="' + c.code + '" value="' + (price || '') + '" placeholder="₹">' : '') + '</div></div>';
+    }).join('');
+  }).join('') +
+    '<label class="f" style="margin-top:10px"><span>Extra discount (₹)</span><input class="i" type="number" inputmode="numeric" min="0" id="nDisc" value="' + (P(d.extraDiscount) || '') + '" placeholder="0"></label>' +
+    (t.combo || d.noCombo ? '<label class="chk"><input type="checkbox" id="nNoCombo"' + (d.noCombo ? '' : ' checked') + '><span>Combo discount lagao (' + rs(st.comboDiscount) + ' off — Digital Shop + Billing)</span></label>' : '') +
+    '<div class="sum"><div><span>Subtotal</span><span>' + rs(t.subtotal) + '</span></div>' + (t.combo ? '<div class="green-t"><span>Combo discount</span><span>− ' + rs(t.combo) + '</span></div>' : '') + (t.extra ? '<div class="green-t"><span>Discount</span><span>− ' + rs(t.extra) + '</span></div>' : '') + '<div class="tot"><span>Total</span><span>' + rs(t.total) + '</span></div></div></div>';
+  html += '<div class="card"><h2>3. Payment</h2><div class="seg"><button type="button" data-mode="full" class="' + (d.plan.mode !== 'emi' ? 'on' : '') + '">Full payment</button><button type="button" data-mode="emi" class="' + (d.plan.mode === 'emi' ? 'on' : '') + '">EMI (0% interest)</button></div>' +
+    (d.plan.mode === 'emi' ? '<div class="two"><label class="f"><span>Advance / down payment (₹)</span><input class="i" type="number" inputmode="numeric" min="0" id="nDown" value="' + (P(d.plan.down) || '') + '" placeholder="0 = poora EMI"></label><label class="f"><span>Kitne mahine (1–' + MAX_EMI + ')</span><select class="i" id="nMonths">' + Array.from({ length: MAX_EMI }, (_, i) => i + 1).map(m => '<option' + (m === P(d.plan.months) ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></label></div>' +
+      '<label class="f"><span>Pehli EMI kis mahine ki 1 tarikh?</span><input class="i" type="month" id="nStart" value="' + esc((d.plan.start || firstOfNextMonth(d.date)).slice(0, 7)) + '"></label>' : '') +
+    (t.total > 0 ? '<table class="sch"><thead><tr><th>Kisht</th><th>Due date</th><th class="r">Amount</th></tr></thead><tbody>' + sch.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtDay(r.due) + '</td><td class="r">' + rs(r.amount) + '</td></tr>').join('') + '</tbody></table><p class="tiny" style="margin:8px 0 0">Total ' + rs(sch.reduce((a, r) => a + r.amount, 0)) + ' = order total ' + rs(t.total) + ' ✓ • koi interest nahi</p>' : '<div class="empty">Pehle package chuno.</div>') + '</div>';
+  html += '<div class="card"><h2>4. Details</h2><div class="two"><label class="f"><span>Order date</span><input class="i" type="date" id="nDate" value="' + esc(d.date) + '"></label><label class="f"><span>Stage</span><select class="i" id="nStage">' + STAGES.map(x => '<option' + (x === d.stage ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></label></div>' +
+    '<label class="f"><span>Notes (optional)</span><textarea class="i" id="nNotes" placeholder="Requirements, colours, deadline…">' + esc(d.notes || '') + '</textarea></label></div>';
+  html += '<div class="btns grid2"><button class="btn" type="button" id="nCancel">Cancel</button><button class="btn gold" type="button" id="nSave">' + (editing ? 'Save changes' : 'Order save karo') + '</button></div>';
+  view().innerHTML = html;
+
+  const rerender = () => { const y = window.scrollY; renderNew(editId); window.scrollTo(0, y); };
+  $('#nClient').onchange = e => { d.clientId = e.target.value; };
+  $('#nNewClient').onclick = () => clientForm(null, c => { d.clientId = c.id; rerender(); });
+  $$('[data-pick]').forEach(el => el.onclick = () => {
+    const c = st.catalog.find(x => x.code === el.dataset.pick), cur = qtyOf(c.code);
+    d.items = d.items.filter(i => i.group !== c.group);
+    if (!cur) d.items.push({ code: c.code, group: c.group, name: c.name, price: c.price, qty: 1 });
+    rerender();
+  });
+  $$('[data-q]').forEach(b => b.onclick = () => {
+    const c = st.catalog.find(x => x.code === b.dataset.q); let it = d.items.find(i => i.code === c.code);
+    if (!it) { it = { code: c.code, group: c.group, name: c.name, price: c.price, qty: 0 }; d.items.push(it); }
+    it.qty = Math.max(0, P(it.qty) + Number(b.dataset.d));
+    if (!it.qty) d.items = d.items.filter(i => i !== it);
+    rerender();
+  });
+  $$('[data-p]').forEach(inp => inp.onchange = () => {
+    const c = st.catalog.find(x => x.code === inp.dataset.p); let it = d.items.find(i => i.code === c.code);
+    if (!it) { it = { code: c.code, group: c.group, name: c.name, price: 0, qty: 1 }; d.items.push(it); }
+    it.price = Math.max(0, P(inp.value)); rerender();
+  });
+  $('#nDisc').onchange = e => { d.extraDiscount = Math.max(0, P(e.target.value)); rerender(); };
+  if ($('#nNoCombo')) $('#nNoCombo').onchange = e => { d.noCombo = !e.target.checked; rerender(); };
+  $$('[data-mode]').forEach(b => b.onclick = () => { d.plan.mode = b.dataset.mode; if (!d.plan.start) d.plan.start = firstOfNextMonth(d.date); rerender(); });
+  if ($('#nDown')) $('#nDown').onchange = e => { d.plan.down = Math.max(0, P(e.target.value)); rerender(); };
+  if ($('#nMonths')) $('#nMonths').onchange = e => { d.plan.months = P(e.target.value); rerender(); };
+  if ($('#nStart')) $('#nStart').onchange = e => { if (e.target.value) { d.plan.start = e.target.value + '-01'; rerender(); } };
+  $('#nDate').onchange = e => { const old = d.date; d.date = e.target.value || today(); if (d.plan.start === firstOfNextMonth(old)) d.plan.start = firstOfNextMonth(d.date); rerender(); };
+  $('#nStage').onchange = e => { d.stage = e.target.value; };
+  $('#nNotes').oninput = e => { d.notes = e.target.value; };
+  $('#nCancel').onclick = () => { draft = null; location.hash = editing ? '#order/' + editing.id : '#home'; };
+  $('#nSave').onclick = async () => {
+    const tt = orderTotals(d);
+    if (!d.clientId) { toast('Client chuno'); return; }
+    if (!d.items.some(i => P(i.qty) > 0)) { toast('Kam se kam ek package chuno'); return; }
+    if (d.items.some(i => P(i.qty) > 0 && !(P(i.price) > 0))) { toast('Custom item ka price daalo'); return; }
+    if (d.plan.mode === 'emi' && P(d.plan.down) > tt.total) { toast('Advance total se zyada nahi ho sakta'); return; }
+    if (editing) { const paid = paidFor(editing); if (paid > tt.total && !(await confirmBox('Is order pe ' + rs(paid) + ' pehle hi mil chuka hai, jo naye total ' + rs(tt.total) + ' se zyada hai. Phir bhi save karna hai?', 'Save'))) return; }
+    const rec = JSON.parse(JSON.stringify(d)); delete rec._for;
+    rec.items = rec.items.filter(i => P(i.qty) > 0);
+    if (rec.plan.mode === 'emi') { rec.plan.down = R(P(rec.plan.down)); rec.plan.months = Math.min(MAX_EMI, Math.max(1, P(rec.plan.months))); rec.plan.start = rec.plan.start || firstOfNextMonth(rec.date); }
+    if (rec.stage === 'Live' && !rec.liveDate) { rec.liveDate = today(); if (hasSupportable(rec)) rec.supportUntil = addYear(rec.liveDate); }
+    if (!editing) { await syncIfPossible(); rec.orderNo = nextNumber('order'); }
+    await saveOne('Orders', rec, !editing);
+    draft = null; toast(editing ? 'Order update ho gaya' : 'Order ' + rec.orderNo + ' save ho gaya');
+    location.hash = '#order/' + rec.id;
+  };
+}
+
+/* ------------------------------------------------------------ CLIENTS */
+function renderClients() {
+  setTitle('Clients', false);
+  const q = (renderClients.q || '').toLowerCase();
+  let list = live('Clients').sort((a, b) => a.name.localeCompare(b.name));
+  if (q) list = list.filter(c => (c.name + ' ' + (c.business || '') + ' ' + (c.phone || '') + ' ' + (c.city || '')).toLowerCase().includes(q));
+  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="cq" placeholder="Naam, business ya number" value="' + esc(renderClients.q || '') + '"></div>' +
+    '<div class="card list">' + (list.length ? list.map(c => { const os = live('Orders').filter(o => o.clientId === c.id && o.stage !== 'Cancelled' && o.stage !== 'Enquiry'); const bal = R(os.reduce((s, o) => s + orderState(o).balance, 0));
+      return '<a class="row" href="#client/' + c.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(c.business || '') + (c.business && c.phone ? ' • ' : '') + esc(c.phone || '') + '</small></div><div class="amt">' + (bal > 0 ? '<span class="red-t">' + rs(bal) + '</span><small>baaki</small>' : '<small>' + os.length + ' order' + (os.length === 1 ? '' : 's') + '</small>') + '</div></a>'; }).join('') : '<div class="empty">Koi client nahi. Naya client add karo.</div>') + '</div>' +
+    '<button class="btn gold fab" id="addClient">＋ Client</button>';
+  $('#cq').oninput = e => { renderClients.q = e.target.value; const pos = e.target.selectionStart; renderClients(); const i = $('#cq'); i.focus(); i.setSelectionRange(pos, pos); };
+  $('#addClient').onclick = () => clientForm(null, c => { location.hash = '#client/' + c.id; });
+}
+function clientForm(c, after) {
+  const isNew = !c;
+  sheet(isNew ? 'Naya client' : 'Client edit', '<form id="cf"><label class="f"><span>Naam *</span><input class="i" name="name" required maxlength="60" value="' + esc(c ? c.name : '') + '"></label>' +
+    '<label class="f"><span>Business / shop ka naam</span><input class="i" name="business" maxlength="80" value="' + esc(c ? c.business : '') + '"></label>' +
+    '<label class="f"><span>WhatsApp number *</span><input class="i" name="phone" required inputmode="tel" maxlength="16" placeholder="10 digit" value="' + esc(c ? c.phone : '') + '"></label>' +
+    '<label class="f"><span>City / address</span><input class="i" name="city" maxlength="140" value="' + esc(c ? c.city : '') + '"></label>' +
+    '<label class="f"><span>Notes</span><textarea class="i" name="notes" style="min-height:70px">' + esc(c ? c.notes : '') + '</textarea></label>' +
+    '<div class="err red-t tiny" id="cferr"></div><button class="btn gold block" type="submit">Save</button></form>', (el, close) => {
+    $('#cf', el).onsubmit = async e => {
+      e.preventDefault(); const f = new FormData(e.target);
+      const phone = digits(f.get('phone'));
+      if (!(phone.length === 10 || (phone.length === 12 && phone.startsWith('91')) || (phone.length === 11 && phone.startsWith('0')))) { $('#cferr', el).textContent = 'Sahi 10 digit mobile number daalo'; return; }
+      const dup = live('Clients').find(x => waNumber(x.phone) === waNumber(phone) && (!c || x.id !== c.id));
+      if (dup) { $('#cferr', el).textContent = 'Ye number pehle se ' + dup.name + ' ke naam pe hai'; return; }
+      const rec = c ? get('Clients', c.id) : { id: uid() };
+      rec.name = String(f.get('name')).trim(); rec.business = String(f.get('business')).trim(); rec.phone = phone.slice(-10); rec.city = String(f.get('city')).trim(); rec.notes = String(f.get('notes')).trim();
+      await saveOne('Clients', rec, isNew); close(); toast('Client save ho gaya'); if (after) after(rec); else render();
+    };
+  });
+}
+function renderClient(id) {
+  const c = get('Clients', id); if (!c) { setTitle('Client', true); view().innerHTML = '<div class="card empty">Client nahi mila.</div>'; return; }
+  setTitle(c.name, true);
+  const orders = live('Orders').filter(o => o.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
+  const billed = orders.filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry');
+  const total = R(billed.reduce((s, o) => s + orderState(o).total, 0)), paid = R(billed.reduce((s, o) => s + orderState(o).paid, 0)), bal = R(billed.reduce((s, o) => s + orderState(o).balance, 0));
+  const pays = live('Payments').filter(p => p.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
+  view().innerHTML = '<div class="card"><div class="hd"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><h3>' + esc(c.name) + '</h3><small>' + esc(c.business || '') + '</small><small style="display:block">' + esc(fmtPhone(c.phone)) + (c.city ? ' • ' + esc(c.city) : '') + '</small></div></div>' +
+    (c.notes ? '<p class="tiny" style="white-space:pre-wrap">' + esc(c.notes) + '</p>' : '') +
+    '<div class="btns grid2"><button class="btn green wa" data-act="waHello" data-id="' + c.id + '">' + WA_ICON + 'WhatsApp</button><a class="btn" href="tel:+' + waNumber(c.phone) + '">📞 Call</a><button class="btn gold" id="cNewOrder">＋ Naya order</button><button class="btn" id="cEdit">✏️ Edit</button></div></div>' +
+    '<div class="kpis"><div class="kpi"><small>Total billed</small><b>' + rs(total) + '</b></div><div class="kpi ' + (bal > 0 ? 'red' : 'green') + '"><small>Baaki</small><b>' + rs(bal) + '</b></div></div>' +
+    '<div class="card list"><h2>Orders <span class="cnt">' + orders.length + '</span></h2>' + (orders.length ? orders.map(orderRow).join('') : '<div class="empty">Abhi koi order nahi.</div>') + '</div>' +
+    '<div class="card list"><h2>Payments <span class="cnt">' + pays.length + '</span> <span class="tiny" style="margin-left:auto">Paid ' + rs(paid) + '</span></h2>' + (pays.length ? pays.map(payRow).join('') : '<div class="empty">Abhi koi payment nahi.</div>') + '</div>' +
+    (orders.length ? '' : '<button class="btn red block" id="cDel">🗑 Client delete karo</button>');
+  $('#cEdit').onclick = () => clientForm(c, () => renderClient(id));
+  $('#cNewOrder').onclick = () => { draft = null; renderNew.preClient = id; location.hash = '#new'; };
+  if ($('#cDel')) $('#cDel').onclick = async () => { if (await confirmBox('Client ' + c.name + ' ko delete karna hai?', 'Delete', true)) { await remove('Clients', get('Clients', id)); toast('Client delete ho gaya'); location.hash = '#clients'; } };
+}
+
+/* ------------------------------------------------------------ PAYMENTS */
+function payForm(orderId, amount, existing) {
+  const o = get('Orders', orderId || (existing && existing.orderId)); if (!o) return;
+  const c = clientOf(o), s = orderState(o);
+  const p = existing || { date: today(), amount: amount || (s.next ? s.next.pending : s.balance), method: 'UPI', reference: '', note: '' };
+  sheet(existing ? 'Payment edit' : 'Payment mila', '<p class="tiny" style="margin-top:-6px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • baaki ' + rs(s.balance) + '</p><form id="pf">' +
+    '<div class="two"><label class="f"><span>Amount (₹) *</span><input class="i" name="amount" type="number" inputmode="decimal" min="1" step="0.01" required value="' + (P(p.amount) || '') + '"></label><label class="f"><span>Date</span><input class="i" name="date" type="date" required value="' + esc(p.date) + '"></label></div>' +
+    '<label class="f"><span>Method</span><select class="i" name="method">' + METHODS.map(m => '<option' + (m === p.method ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></label>' +
+    '<label class="f"><span>UTR / reference (optional)</span><input class="i" name="reference" maxlength="40" value="' + esc(p.reference || '') + '"></label>' +
+    '<div class="btns grid2" style="margin-top:12px">' + (existing ? '<button class="btn red" type="button" id="pDel">Delete</button>' : '<button class="btn" type="button" data-close>Cancel</button>') + '<button class="btn gold" type="submit">Save</button></div></form>', (el, close) => {
+    $('#pf', el).onsubmit = async e => {
+      e.preventDefault(); const f = new FormData(e.target);
+      const amt = R(f.get('amount')); if (!(amt > 0)) { toast('Amount daalo'); return; }
+      const rec = existing ? get('Payments', existing.id) : { id: uid(), orderId: o.id, clientId: o.clientId };
+      rec.amount = amt; rec.date = String(f.get('date')) || today(); rec.method = String(f.get('method')); rec.reference = String(f.get('reference')).trim();
+      await saveOne('Payments', rec, !existing); close();
+      const after = orderState(get('Orders', o.id));
+      render();
+      if (existing) { toast('Payment update ho gaya • baaki ' + rs(after.balance)); return; }
+      sheet('Payment save ho gaya ✅', '<p style="margin:0 0 6px;font-size:22px;font-weight:800;color:#7ee6ac">' + rs(amt) + '</p><p class="tiny" style="margin:0 0 16px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • baaki ' + rs(after.balance) + (after.next ? ' • agli kisht ' + rs(after.next.pending) + ' on ' + fmtDay(after.next.due) : '') + '</p>' +
+        '<div class="btns grid2"><button class="btn" data-close type="button">Baad mein</button><button class="btn green wa" type="button" id="sendRc">' + WA_ICON + 'Receipt bhejo</button></div>', (el2, close2) => {
+        $('#sendRc', el2).onclick = async () => { close2(); await sendReceipt(get('Payments', rec.id)); };
+      });
+    };
+    if ($('#pDel', el)) $('#pDel', el).onclick = async () => { if (await confirmBox('Ye payment delete karna hai?', 'Delete', true)) { const r = get('Payments', existing.id); await remove('Payments', r); const rc = live('Invoices').find(i => i.kind === 'receipt' && i.paymentId === r.id); if (rc) await remove('Invoices', rc); close(); toast('Payment delete ho gaya'); render(); } };
+  });
+}
+let payMonth = '';
+function renderPayments() {
+  setTitle('Payments', true);
+  payMonth = payMonth || today().slice(0, 7);
+  const list = live('Payments').filter(p => String(p.date).startsWith(payMonth)).sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+  const sum = R(list.reduce((s, p) => s + P(p.amount), 0));
+  const byM = {}; list.forEach(p => { byM[p.method] = R((byM[p.method] || 0) + P(p.amount)); });
+  view().innerHTML = '<div class="card"><div class="two"><label class="f" style="margin:0"><span>Mahina</span><input class="i" type="month" id="pm" value="' + payMonth + '"></label><div><span class="tiny" style="display:block;margin-bottom:5px;font-weight:700">Total</span><b style="font-size:24px;color:#7ee6ac">' + rs(sum) + '</b></div></div>' +
+    (Object.keys(byM).length ? '<p class="tiny" style="margin:10px 0 0">' + Object.entries(byM).map(([m, v]) => esc(m) + ': ' + rs(v)).join(' • ') + '</p>' : '') + '</div>' +
+    '<div class="card list">' + (list.length ? list.map(payRow).join('') : '<div class="empty">Is mahine koi payment nahi.</div>') + '</div>' +
+    '<button class="btn block" id="pcsv">⬇️ Is mahine ka CSV</button>';
+  $('#pm').onchange = e => { payMonth = e.target.value || today().slice(0, 7); renderPayments(); };
+  $('#pcsv').onclick = () => {
+    const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const rows = [['Date', 'Client', 'Business', 'Order', 'Package', 'Amount', 'Method', 'Reference']].concat(list.map(p => { const o = get('Orders', p.orderId) || {}, c = get('Clients', p.clientId) || {}; return [p.date, c.name, c.business, o.orderNo, o.items ? orderService(o) : '', p.amount, p.method, p.reference]; }));
+    const blob = new Blob(['﻿' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'payments-' + payMonth + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  };
+}
+
+/* ------------------------------------------------------------ MORE */
+function renderMore(sub) {
+  const st = settings();
+  if (sub === 'business') {
+    setTitle('Business details', true);
+    view().innerHTML = '<form class="card" id="bf"><label class="f"><span>Business ka naam</span><input class="i" name="business" value="' + esc(st.business) + '"></label>' +
+      '<label class="f"><span>Tagline (invoice pe)</span><input class="i" name="tagline" value="' + esc(st.tagline) + '"></label>' +
+      '<div class="two"><label class="f"><span>WhatsApp / phone</span><input class="i" name="phone" inputmode="tel" value="' + esc(st.phone) + '"></label><label class="f"><span>Email</span><input class="i" name="email" type="email" value="' + esc(st.email) + '"></label></div>' +
+      '<label class="f"><span>Address (invoice pe)</span><input class="i" name="address" value="' + esc(st.address) + '"></label>' +
+      '<div class="two"><label class="f"><span>UPI ID *</span><input class="i" name="upiId" placeholder="name@okaxis" value="' + esc(st.upiId) + '"></label><label class="f"><span>UPI pe naam</span><input class="i" name="upiName" value="' + esc(st.upiName) + '"></label></div>' +
+      '<div class="two"><label class="f"><span>Number prefix</span><input class="i" name="prefix" maxlength="6" value="' + esc(st.prefix) + '"></label><label class="f"><span>EMI round off (₹)</span><select class="i" name="emiRound">' + [1, 10, 50, 100].map(v => '<option' + (v === P(st.emiRound) ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></label></div>' +
+      '<div class="two"><label class="f"><span>Combo discount (₹)</span><input class="i" name="comboDiscount" type="number" min="0" value="' + P(st.comboDiscount) + '"></label><label class="f"><span>Support renewal fee (₹)</span><input class="i" name="supportFee" type="number" min="0" value="' + P(st.supportFee) + '"></label></div>' +
+      '<button class="btn gold block" type="submit">Save</button></form>';
+    $('#bf').onsubmit = async e => {
+      e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+      const upi = String(f.upiId).trim();
+      if (upi && !/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)) { toast('UPI ID sahi format mein daalo (name@bank)'); return; }
+      await saveSettings({ business: f.business.trim() || DEFAULT_SETTINGS.business, tagline: f.tagline.trim(), phone: digits(f.phone) ? waNumber(f.phone) : DEFAULT_SETTINGS.phone, email: f.email.trim(), address: f.address.trim(), upiId: upi, upiName: f.upiName.trim(), prefix: (f.prefix.trim() || 'ITW').toUpperCase(), emiRound: P(f.emiRound) || 1, comboDiscount: Math.max(0, P(f.comboDiscount)), supportFee: Math.max(0, P(f.supportFee)) });
+      toast('Save ho gaya'); location.hash = '#more';
+    };
+    return;
+  }
+  if (sub === 'prices') {
+    setTitle('Packages & prices', true);
+    view().innerHTML = '<form class="card" id="prf"><p class="tiny" style="margin-top:0">Price badloge toh sirf naye orders pe lagega. Purane orders apne price pe rehte hain.</p>' + st.catalog.map((c, i) => '<div class="two" style="align-items:end"><label class="f"><span>' + esc(c.group) + '</span><input class="i" name="n' + i + '" value="' + esc(c.name) + '"></label><label class="f"><span>Price (₹)' + (c.group === 'custom' ? ' — 0 = har baar daalo' : '') + '</span><input class="i" type="number" min="0" name="p' + i + '" value="' + P(c.price) + '"></label></div>').join('') + '<button class="btn gold block" type="submit">Save</button></form>';
+    $('#prf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); const cat = st.catalog.map((c, i) => Object.assign({}, c, { name: String(f.get('n' + i)).trim() || c.name, price: Math.max(0, P(f.get('p' + i))) })); await saveSettings({ catalog: cat }); toast('Prices save ho gaye'); location.hash = '#more'; };
+    return;
+  }
+  if (sub === 'templates') {
+    setTitle('WhatsApp messages', true);
+    const labels = { reminder: 'EMI reminder', receipt: 'Payment receipt', invoice: 'Invoice', quote: 'Quotation', support: 'Support renewal', hello: 'General message' };
+    view().innerHTML = '<form class="card" id="tf"><p class="tiny" style="margin-top:0">{name}, {amount}, {dueText}, {orderNo}, {upi}, {business} jaise words apne aap bhar jaate hain. *text* = bold.</p>' + Object.keys(labels).map(k => '<label class="f"><span>' + labels[k] + '</span><textarea class="i" name="' + k + '" style="min-height:150px">' + esc(st.templates[k]) + '</textarea></label>').join('') + '<div class="btns grid2"><button class="btn" type="button" id="tReset">Default wapas</button><button class="btn gold" type="submit">Save</button></div></form>';
+    $('#tf').onsubmit = async e => { e.preventDefault(); await saveSettings({ templates: Object.fromEntries(new FormData(e.target)) }); toast('Messages save ho gaye'); location.hash = '#more'; };
+    $('#tReset').onclick = async () => { if (await confirmBox('Saare messages default pe wapas?', 'Haan')) { await saveSettings({ templates: {} }); renderMore('templates'); } };
+    return;
+  }
+  if (sub === 'sync') {
+    setTitle('Google Sheet sync', true);
+    view().innerHTML = '<div class="card"><h2>Status: <span id="ss">' + esc(S.url ? (S.sync.state === 'err' ? 'Error — ' + S.sync.msg : S.outbox.size ? S.outbox.size + ' changes upload baaki' : 'Connected') : 'Not connected (sirf is phone pe)') + '</span></h2>' + (S.lastSync ? '<p class="tiny">Last sync: ' + new Date(S.lastSync).toLocaleString('en-IN') + '</p>' : '') +
+      '<form id="sf"><label class="f"><span>Apps Script Web App URL</span><input class="i" name="url" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(S.url) + '"></label><label class="f"><span>Secret key</span><input class="i" name="key" type="password" value="' + esc(S.key) + '"></label>' +
+      '<div class="btns grid2"><button class="btn" type="button" id="sTest">Test</button><button class="btn gold" type="submit">Save & sync</button></div>' + (S.url ? '<button class="btn red block" type="button" id="sOff" style="margin-top:8px">Disconnect</button>' : '') + '</form></div>' +
+      '<div class="card"><h2>Setup (ek baar, laptop pe aasaan)</h2><ol class="guide"><li>Google Sheets mein nayi blank sheet banao: <b>Izyan Tech Manager</b>. Kisi ke saath share mat karna.</li><li><b>Extensions → Apps Script</b> kholo, wahan ka code hata ke repo ki <code class="k">manager/apps-script/Code.gs</code> ka poora code paste karo, Save.</li><li>Function list mein <b>setupSheet</b> chuno → <b>Run</b> → permission Allow karo.</li><li>⚙️ Project Settings → Script properties → <b>SECRET_KEY</b> naam se 20+ character ka password daalo.</li><li><b>Deploy → New deployment → Web app</b>, Execute as <b>Me</b>, Who has access <b>Anyone</b> → Deploy, URL copy karo.</li><li>Yahan URL aur wahi secret key daal ke <b>Save & sync</b>. Doosre phone/laptop pe bhi yahi 2 cheezein daalo.</li></ol><p class="tiny">"Anyone" ka matlab ye nahi ki koi bhi data dekh sakta hai — har request mein secret key check hoti hai.</p></div>';
+    const read = () => { const f = new FormData($('#sf')); return { url: String(f.get('url')).trim(), key: String(f.get('key')).trim() }; };
+    $('#sTest').onclick = async () => { const { url, key } = read(); if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('URL https://script.google.com/macros/s/…/exec jaisa hona chahiye', 4000); return; } try { await api('ping', {}, url, key); toast('✅ Sheet connected'); } catch (e) { toast('❌ ' + e.message, 5000); } };
+    $('#sf').onsubmit = async e => {
+      e.preventDefault(); const { url, key } = read();
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('URL https://script.google.com/macros/s/…/exec jaisa hona chahiye', 4000); return; }
+      if (key.length < 8) { toast('Secret key daalo'); return; }
+      try { await api('ping', {}, url, key); } catch (err) { toast('❌ ' + err.message, 5000); return; }
+      const fresh = S.url !== url; S.url = url; S.key = key; await saveMeta('conn', { url, key });
+      if (fresh) { S.cursor = 0; await saveMeta('cursor', 0); TABLES.forEach(t => S.t[t].forEach(r => S.outbox.add(t + '|' + r.id))); await saveOutbox(); }
+      toast('Sync shuru…'); await syncNow(); toast(S.sync.state === 'err' ? '❌ ' + S.sync.msg : '✅ Sync ho gaya', 4000); renderMore('sync');
+    };
+    if ($('#sOff')) $('#sOff').onclick = async () => { if (await confirmBox('Sheet se disconnect karna hai? Data is phone pe rahega.', 'Disconnect', true)) { S.url = ''; S.key = ''; S.sync = { state: 'off', msg: '' }; await saveMeta('conn', { url: '', key: '' }); updateChip(); renderMore('sync'); } };
+    return;
+  }
+  setTitle('More', false);
+  const counts = TABLES.slice(0, 4).map(t => t + ': ' + live(t).length).join(' • ');
+  view().innerHTML = '<div class="card list"><a class="row" href="#payments"><div class="main"><b>📒 Payments</b><small>Mahine ke hisaab se collection, CSV</small></div></a>' +
+    '<a class="row" href="#more/business"><div class="main"><b>🏢 Business details & UPI</b><small>' + esc(st.business) + (st.upiId ? ' • ' + esc(st.upiId) : ' • UPI ID baaki') + '</small></div></a>' +
+    '<a class="row" href="#more/prices"><div class="main"><b>🏷️ Packages & prices</b><small>Digital Shop, Billing, add-ons</small></div></a>' +
+    '<a class="row" href="#more/templates"><div class="main"><b>💬 WhatsApp messages</b><small>Reminder, receipt, invoice, quotation</small></div></a>' +
+    '<a class="row" href="#more/sync"><div class="main"><b>☁️ Google Sheet sync</b><small>' + (S.url ? 'Connected' : 'Not connected') + '</small></div></a></div>' +
+    '<div class="card"><h2>Backup</h2><p class="tiny" style="margin-top:0">' + counts + '</p><div class="btns grid2"><button class="btn" id="bExp">⬇️ Backup file</button><button class="btn" id="bImp">⬆️ Restore</button></div></div>' +
+    '<div class="card"><h2>Security</h2><div class="btns grid2"><button class="btn" id="lockNow">🔒 Lock now</button><button class="btn" id="chPin">🔑 PIN badlo</button></div></div>' +
+    '<p class="tiny" style="text-align:center">Izyan Tech Manager • ' + esc(S.me ? S.me.name : '') + '</p>';
+  $('#lockNow').onclick = () => showLock();
+  $('#chPin').onclick = () => sheet('PIN badlo', '<form id="pinf"><label class="f"><span>Purana PIN</span><input class="i" name="old" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>Naya PIN (4 ya 6 digit)</span><input class="i" name="n1" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>Naya PIN dobara</span><input class="i" name="n2" type="password" inputmode="numeric" maxlength="6" required></label><button class="btn gold block">Save</button></form>', (el, close) => {
+    $('#pinf', el).onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); if (await hashPin(String(f.get('old')), S.me.salt) !== S.me.pinHash) { toast('Purana PIN galat hai'); return; } const n1 = String(f.get('n1')); if (!/^(\d{4}|\d{6})$/.test(n1) || n1 !== String(f.get('n2'))) { toast('Naya PIN 4/6 digit ka aur dono same hone chahiye'); return; } const salt = uid(); S.me = Object.assign({}, S.me, { salt, pinHash: await hashPin(n1, salt), pinLen: n1.length }); await saveMeta('profile', S.me); close(); toast('PIN badal gaya'); };
+  });
+  $('#bExp').onclick = () => {
+    const data = { app: 'izyan-tech-manager', version: 1, exportedAt: nowISO(), tables: Object.fromEntries(TABLES.map(t => [t, [...S.t[t].values()]])) };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'izyan-tech-manager-backup-' + today() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    toast('Backup file download ho gayi');
+  };
+  $('#bImp').onclick = () => $('#importFile').click();
+}
+$('#importFile').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+  let data; try { data = JSON.parse(await file.text()); } catch (err) { toast('Ye backup file sahi nahi hai'); return; }
+  if (!data || data.app !== 'izyan-tech-manager' || !data.tables) { toast('Ye Izyan Tech Manager ki backup file nahi hai'); return; }
+  if (!(await confirmBox('Backup restore karna hai? Jo record backup mein naye hain wahi lagenge, baaki data safe rahega.', 'Restore'))) return;
+  const writes = []; let n = 0;
+  TABLES.forEach(t => (data.tables[t] || []).forEach(r => { if (!r || !r.id) return; const cur = S.t[t].get(r.id); if (!cur || isNewer(r, cur)) { S.t[t].set(r.id, r); writes.push([t, r]); S.outbox.add(t + '|' + r.id); n++; } }));
+  await putRecs(writes); await saveOutbox(); scheduleSync(); toast(n + ' records restore hue'); render();
+};
+
+/* ------------------------------------------------------------ actions (event delegation) */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b || !S.unlocked) return;
+  e.preventDefault(); e.stopPropagation();
+  const id = b.dataset.id, act = b.dataset.act;
+  if (act === 'pay') return payForm(id, P(b.dataset.amt));
+  if (act === 'editPay') { const p = get('Payments', id); if (p) payForm(p.orderId, 0, p); return; }
+  if (act === 'receipt') { const p = get('Payments', id); if (p) { b.disabled = true; try { await sendReceipt(p); } finally { b.disabled = false; } } return; }
+  if (act === 'invoice') { const o = get('Orders', id); if (o) { b.disabled = true; try { await sendInvoice(o); } finally { b.disabled = false; } } return; }
+  if (act === 'waHello') { const c = get('Clients', id); if (c) openWA(c.phone, fill(settings().templates.hello, { name: c.name, business: settings().business })); return; }
+  if (act === 'waQuote') { const o = get('Orders', id); if (o) openWA(clientOf(o).phone, msgQuote(o)); return; }
+  if (act === 'waSupport') { const o = get('Orders', id); if (o) openWA(clientOf(o).phone, msgSupport(o)); return; }
+  if (act === 'waRemind') {
+    const o = get('Orders', id); if (!o) return;
+    const r = orderState(o).rows.find(x => String(x.n) === String(b.dataset.n)); if (!r) return;
+    openWA(clientOf(o).phone, msgReminder(o, r));
+    const rec = get('Orders', id); rec.reminders = Object.assign({}, rec.reminders || {}, { [r.n]: today() }); await saveOne('Orders', rec); render();
+    return;
+  }
+  if (act === 'renew') {
+    const o = get('Orders', id), st = settings(), sup = st.catalog.find(c => c.code === 'SUPPORT') || { code: 'SUPPORT', group: 'support', name: 'Yearly support renewal' };
+    draft = { id: uid(), orderNo: '', clientId: o.clientId, date: today(), stage: 'Confirmed', items: [{ code: sup.code, group: 'support', name: sup.name + ' — ' + orderService(o), price: P(st.supportFee), qty: 1 }], plan: { mode: 'full', down: 0, months: 6, start: firstOfNextMonth(today()) }, extraDiscount: 0, notes: 'Renewal for ' + o.orderNo, renewalOf: o.id, _for: 'new' };
+    const rec = get('Orders', id); rec.supportRenewed = true; await saveOne('Orders', rec);
+    location.hash = '#new'; return;
+  }
+  if (act === 'delOrder') {
+    const o = get('Orders', id); if (!o) return;
+    if (orderPayments(o).length) { toast('Is order pe payments hain — pehle unhe delete karo'); return; }
+    if (await confirmBox('Order ' + o.orderNo + ' hamesha ke liye delete karna hai?', 'Delete', true)) { await remove('Orders', o); live('Invoices').filter(i => i.orderId === o.id).forEach(i => remove('Invoices', i)); toast('Order delete ho gaya'); location.hash = '#orders'; }
+  }
+});
+$$('.nav a').forEach(a => a.addEventListener('click', () => { if (a.dataset.nav === 'new') draft = null; }));
+window.addEventListener('online', () => scheduleSync(300));
+
+/* ------------------------------------------------------------ start */
+(async function start() {
+  try { await loadAll(); }
+  catch (e) { document.body.innerHTML = '<p style="padding:24px">Storage nahi khul paaya: ' + esc(e.message) + '. Private/incognito mode band karke kholo.</p>'; return; }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if (S.url) S.sync.state = 'ok';
+  updateChip();
+  showLock();
+})();
+</script>
+</body>
+</html>

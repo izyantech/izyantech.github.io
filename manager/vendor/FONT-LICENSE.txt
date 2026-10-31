@@ -1,0 +1,2 @@
+dejavu.js / dejavu-Bold.js contain a subset of DejaVu Sans (https://dejavu-fonts.github.io/),
+released under the Bitstream Vera / DejaVu free font license. Used to print the ₹ sign in PDFs.

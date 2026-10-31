@@ -1,6 +1,6 @@
 /* IZYAN TECH WORLD — offline support.
    Bump VERSION whenever index.html or assets change so phones pick up the new site. */
-const VERSION = 'itw-v3';
+const VERSION = 'itw-v4';
 const CORE = [
   './',
   './index.html',
@@ -21,7 +21,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('itw-v') && k !== VERSION).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -31,6 +31,7 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // WhatsApp, client sites etc. go straight to the network
+  if (url.pathname.startsWith('/manager/')) return; // the manager app has its own service worker
   if (req.headers.has('range') || url.pathname.endsWith('.mp4')) return; // videos stream from the network (range requests can't be cached)
 
   // Pages: try the network first so updates show up, fall back to the cached copy when offline.
