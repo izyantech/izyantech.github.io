@@ -173,11 +173,11 @@ const DEFAULT_SETTINGS = {
     { code: 'TOOL', group: 'custom', name: 'Custom tool / WhatsApp automation', price: 0, unit: '' }
   ],
   templates: {
-    reminder: 'Hi {name} 👋\n\nAapke *{service}* ki EMI {inst} — *₹{amount}* {dueText}.\nOrder: {orderNo}\nIske baad baaki: ₹{balanceAfter}\n\nUPI: {upi}\n\nPayment ke baad screenshot bhej dijiye. Shukriya! 🙏\n— {business}',
-    receipt: 'Hi {name} ✅\n\n₹{amount} ka payment mil gaya ({method}, {date}). Shukriya!\nOrder: {orderNo}\nBaaki balance: ₹{balance}\n{nextLine}\n— {business}',
-    invoice: 'Hi {name},\n\nAapka invoice *{invoiceNo}* attach hai.\nTotal: ₹{total}\nPaid: ₹{paid}\nBaaki: ₹{balance}\n{nextLine}\nUPI: {upi}\n\n— {business}',
-    quote: 'Hi {name} 👋\n\nAapke liye quotation ({orderNo}):\n{items}\n{discountLine}*Total: ₹{total}*\n\n{planText}\n\n0% interest — EMI pe koi extra charge nahi.\nConfirm karne ke liye reply kijiye.\n— {business}',
-    support: 'Hi {name} 👋\n\nAapke *{service}* ka support {supportDate} ko khatam ho raha hai.\nAgle 1 saal ka support renew karne ka charge ₹{fee} hai — fixes, small changes aur WhatsApp help ke saath.\n\nRenew karne ke liye reply kijiye.\n— {business}',
+    reminder: 'Hi {name} 👋\n\nYour {inst} of *₹{amount}* for *{service}* {dueText}.\nOrder: {orderNo}\nBalance after this payment: ₹{balanceAfter}\n\nUPI: {upi}\n\nPlease share the payment screenshot once done. Thank you! 🙏\n— {business}',
+    receipt: 'Hi {name} ✅\n\nWe have received your payment of ₹{amount} ({method}, {date}). Thank you!\nOrder: {orderNo}\nBalance: ₹{balance}\n{nextLine}\n— {business}',
+    invoice: 'Hi {name},\n\nPlease find your invoice *{invoiceNo}* attached.\nTotal: ₹{total}\nPaid: ₹{paid}\nBalance: ₹{balance}\n{nextLine}\nUPI: {upi}\n\n— {business}',
+    quote: 'Hi {name} 👋\n\nHere is your quotation ({orderNo}):\n{items}\n{discountLine}*Total: ₹{total}*\n\n{planText}\n\n0% interest — no extra charge on EMI.\nReply to confirm your order.\n— {business}',
+    support: 'Hi {name} 👋\n\nYour support for *{service}* ends on {supportDate}.\nRenewing support for the next 1 year costs ₹{fee} — includes fixes, small changes and WhatsApp help.\n\nReply to renew.\n— {business}',
     hello: 'Hi {name} 👋\n\n— {business}'
   }
 };
@@ -416,17 +416,17 @@ const remindedOn = (o, n) => (o.reminders || {})[n] || '';
 /* ------------------------------------------------------------ messages */
 function dueText(r) {
   const td = today();
-  if (r.due < td) return fmtShort(r.due) + ' se pending hai';
-  if (r.due === td) return 'aaj (' + fmtShort(r.due) + ') due hai';
-  return fmtShort(r.due) + ' ko due hai';
+  if (r.due < td) return 'has been pending since ' + fmtShort(r.due);
+  if (r.due === td) return 'is due today (' + fmtShort(r.due) + ')';
+  return 'is due on ' + fmtShort(r.due);
 }
 function msgReminder(o, r) {
   const st = settings(), c = clientOf(o), s = orderState(o);
   const balanceAfter = R(Math.max(0, s.balance - r.pending));
-  return fill(st.templates.reminder, { name: c.name, service: orderService(o), inst: r.n === 0 ? '(advance)' : r.label.replace('EMI ', ''), amount: inr(r.pending),
+  return fill(st.templates.reminder, { name: c.name, service: orderService(o), inst: r.n === 0 ? 'advance payment' : r.label, amount: inr(r.pending),
     dueText: dueText(r), orderNo: o.orderNo, balanceAfter: inr(balanceAfter), upi: st.upiId || '—', business: st.business });
 }
-function nextLine(s) { return s.next ? 'Agli kisht: ₹' + inr(s.next.pending) + ' — ' + fmtDay(s.next.due) : 'Poora payment ho gaya ✅'; }
+function nextLine(s) { return s.next ? 'Next instalment: ₹' + inr(s.next.pending) + ' — ' + fmtDay(s.next.due) : 'Fully paid ✅'; }
 function msgReceipt(p) {
   const st = settings(), o = get('Orders', p.orderId), c = get('Clients', p.clientId) || { name: '' }, s = orderState(o);
   return fill(st.templates.receipt, { name: c.name, amount: inr(p.amount), method: p.method, date: fmtDay(p.date), orderNo: o.orderNo, balance: inr(s.balance), nextLine: nextLine(s), business: st.business });
@@ -444,8 +444,8 @@ function planText(o) {
   if (adv) t += '• Advance: ₹' + inr(adv.amount) + '\n';
   if (ems.length) {
     const same = ems.every(r => r.amount === ems[0].amount);
-    t += same ? '• ' + ems.length + ' × ₹' + inr(ems[0].amount) + ' — har mahine 1 tarikh, ' + fmtShort(ems[0].due) + ' se'
-      : '• ' + (ems.length - 1) + ' × ₹' + inr(ems[0].amount) + ' + last ₹' + inr(ems[ems.length - 1].amount) + ' — har mahine 1 tarikh, ' + fmtShort(ems[0].due) + ' se';
+    t += same ? '• ' + ems.length + ' × ₹' + inr(ems[0].amount) + ' — on the 1st of every month from ' + fmtShort(ems[0].due)
+      : '• ' + (ems.length - 1) + ' × ₹' + inr(ems[0].amount) + ' + last ₹' + inr(ems[ems.length - 1].amount) + ' — on the 1st of every month from ' + fmtShort(ems[0].due);
   }
   return t;
 }
@@ -462,7 +462,7 @@ function msgSupport(o) {
   return fill(st.templates.support, { name: c.name, service: orderService(o), supportDate: fmtDay(o.supportUntil), fee: inr(st.supportFee), business: st.business });
 }
 function openWA(phone, text) {
-  if (!digits(phone)) { toast('Client ka WhatsApp number nahi hai'); return; }
+  if (!digits(phone)) { toast('This client has no WhatsApp number'); return; }
   window.open(waLink(phone, text), '_blank', 'noopener');
 }
 
@@ -600,8 +600,8 @@ async function sharePDF(doc, filename, phone, text) {
   }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-  if (phone) openWA(phone, text + '\n\n(PDF attach kar raha hoon)');
-  toast('PDF download ho gaya — WhatsApp chat mein attach kar do', 4200);
+  if (phone) openWA(phone, text + '\n\n(Attaching the PDF)');
+  toast('PDF downloaded — attach it in the WhatsApp chat', 4200);
   return 'downloaded';
 }
 const safeName = s => String(s).replace(/[^\w.-]+/g, '_');
@@ -612,7 +612,7 @@ async function invoiceFor(o) {
   return inv;
 }
 async function sendInvoice(o) {
-  if (!settings().upiId) toast('Tip: More → Business details mein UPI ID daaloge toh invoice pe QR aayega', 3500);
+  if (!settings().upiId) toast('Tip: add your UPI ID in More → Business details to show a payment QR on invoices', 3500);
   const inv = await invoiceFor(o);
   const doc = buildInvoicePDF(o, inv.invoiceNo, inv.date);
   await sharePDF(doc, safeName(inv.invoiceNo) + '.pdf', clientOf(o).phone, msgInvoice(o, inv.invoiceNo));
@@ -644,12 +644,12 @@ async function api(action, payload, url, key) {
   const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 45000);
   try {
     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, key }, payload || {})), redirect: 'follow', signal: ctl.signal });
-    let j; try { j = await res.json(); } catch (e) { throw new Error('Sheet ne sahi jawab nahi diya — Apps Script URL check karo'); }
-    if (!j.ok) throw new Error(j.error === 'BAD_KEY' ? 'Secret key Sheet se match nahi karti' : (j.message || j.error || 'Sheet error'));
+    let j; try { j = await res.json(); } catch (e) { throw new Error('The Sheet did not answer correctly — check the Apps Script URL'); }
+    if (!j.ok) throw new Error(j.error === 'BAD_KEY' ? 'Secret key does not match the Sheet' : (j.message || j.error || 'Sheet error'));
     return j;
   } catch (e) {
-    if (e.name === 'AbortError') throw new Error('Sheet ne bahut der lagayi — dobara try karo');
-    if (e instanceof TypeError) throw new Error(navigator.onLine ? 'Sheet tak nahi pahunch paaye — URL /exec pe khatam hona chahiye aur access "Anyone" hona chahiye' : 'Internet nahi hai');
+    if (e.name === 'AbortError') throw new Error('The Sheet took too long to answer — try again');
+    if (e instanceof TypeError) throw new Error(navigator.onLine ? 'Could not reach the Sheet — the URL must end with /exec and access must be "Anyone"' : 'No internet connection');
     throw e;
   } finally { clearTimeout(tm); }
 }
@@ -728,7 +728,7 @@ function showLock() {
   const L = $('#lock'); L.classList.remove('hide');
   if (!S.me) { renderSetup(L); return; }
   let pin = '';
-  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>Hi ' + esc(S.me.name) + ', PIN daalo</p><div class="dots" id="dots"></div><div class="err" id="perr"></div>' +
+  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>Hi ' + esc(S.me.name) + ', enter your PIN</p><div class="dots" id="dots"></div><div class="err" id="perr"></div>' +
     '<div class="pad">' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '⌫'].map(k => '<button type="button" data-k="' + k + '">' + k + '</button>').join('') + '</div>';
   const len = S.me.pinLen || 4;
   const draw = () => { $('#dots').innerHTML = Array.from({ length: len }, (_, i) => '<i class="' + (i < pin.length ? 'f' : '') + '"></i>').join(''); };
@@ -738,7 +738,7 @@ function showLock() {
     draw();
     if (pin.length === len) {
       if (await hashPin(pin, S.me.salt) === S.me.pinHash) { L.classList.add('hide'); L.innerHTML = ''; S.unlocked = true; document.removeEventListener('keydown', kb); render(); scheduleSync(200); }
-      else { $('#perr').textContent = 'Galat PIN — dobara try karo'; pin = ''; setTimeout(draw, 150); }
+      else { $('#perr').textContent = 'Wrong PIN — try again'; pin = ''; setTimeout(draw, 150); }
     }
   };
   const kb = e => { if (/^\d$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('⌫'); };
@@ -746,21 +746,21 @@ function showLock() {
   L.onclick = e => { const b = e.target.closest('button[data-k]'); if (b) press(b.dataset.k); };
 }
 function renderSetup(L) {
-  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>Pehli baar setup — 30 second</p>' +
-    '<form id="setupForm"><label class="f"><span>Aapka naam</span><input class="i" name="name" required maxlength="30" placeholder="e.g. Abu"></label>' +
-    '<label class="f"><span>4 ya 6 digit PIN</span><input class="i" name="pin" required inputmode="numeric" pattern="\\d{4}|\\d{6}" maxlength="6" type="password" placeholder="••••"></label>' +
-    '<label class="f"><span>PIN dobara</span><input class="i" name="pin2" required inputmode="numeric" maxlength="6" type="password" placeholder="••••"></label>' +
-    '<div class="err" id="serr"></div><button class="btn gold block" type="submit">Shuru karo</button>' +
-    '<p class="tiny" style="margin-top:12px">Data isi phone mein save hota hai. Google Sheet sync baad mein More → Sync se jod sakte ho.</p></form>';
+  L.innerHTML = '<img class="logo" src="icons/icon-192.png" alt=""><h2>Izyan Tech Manager</h2><p>First-time setup — takes 30 seconds</p>' +
+    '<form id="setupForm"><label class="f"><span>Your name</span><input class="i" name="name" required maxlength="30" placeholder="e.g. Abu"></label>' +
+    '<label class="f"><span>4 or 6 digit PIN</span><input class="i" name="pin" required inputmode="numeric" pattern="\\d{4}|\\d{6}" maxlength="6" type="password" placeholder="••••"></label>' +
+    '<label class="f"><span>Confirm PIN</span><input class="i" name="pin2" required inputmode="numeric" maxlength="6" type="password" placeholder="••••"></label>' +
+    '<div class="err" id="serr"></div><button class="btn gold block" type="submit">Get started</button>' +
+    '<p class="tiny" style="margin-top:12px">Your data is saved on this device. You can connect Google Sheet sync later from More → Google Sheet sync.</p></form>';
   $('#setupForm').onsubmit = async e => {
     e.preventDefault(); const f = new FormData(e.target);
     const name = String(f.get('name')).trim(), pin = String(f.get('pin')), pin2 = String(f.get('pin2'));
-    if (!name) return; if (!/^(\d{4}|\d{6})$/.test(pin)) { $('#serr').textContent = 'PIN 4 ya 6 digit ka hona chahiye'; return; }
-    if (pin !== pin2) { $('#serr').textContent = 'Dono PIN match nahi kar rahe'; return; }
+    if (!name) return; if (!/^(\d{4}|\d{6})$/.test(pin)) { $('#serr').textContent = 'PIN must be 4 or 6 digits'; return; }
+    if (pin !== pin2) { $('#serr').textContent = 'The two PINs do not match'; return; }
     const salt = uid(); S.me = { name, salt, pinHash: await hashPin(pin, salt), pinLen: pin.length };
     await saveMeta('profile', S.me);
     L.classList.add('hide'); L.innerHTML = ''; S.unlocked = true; location.hash = '#more/business'; render();
-    toast('Setup ho gaya! Pehle apni business details aur UPI ID bhar do', 4000);
+    toast('All set! Start by adding your business details and UPI ID', 4000);
   };
 }
 let hiddenAt = 0;
@@ -780,10 +780,10 @@ function sheet(title, html, onReady) {
   if (onReady) onReady(bg.querySelector('.sheet'), close);
   return close;
 }
-function confirmBox(text, okText = 'Haan', danger = false) {
+function confirmBox(text, okText = 'Yes', danger = false) {
   return new Promise(res => {
     let done = false;
-    sheet('Confirm', '<p style="margin:0 0 16px">' + esc(text) + '</p><div class="btns grid2"><button class="btn" data-close type="button">Nahi</button><button class="btn ' + (danger ? 'red' : 'gold') + '" id="cfOk" type="button">' + esc(okText) + '</button></div>', (el, close) => {
+    sheet('Confirm', '<p style="margin:0 0 16px">' + esc(text) + '</p><div class="btns grid2"><button class="btn" data-close type="button">No</button><button class="btn ' + (danger ? 'red' : 'gold') + '" id="cfOk" type="button">' + esc(okText) + '</button></div>', (el, close) => {
       $('#cfOk', el).onclick = () => { done = true; close(); res(true); };
       el.parentElement.addEventListener('click', () => setTimeout(() => { if (!done && !document.body.contains(el)) res(false); }, 0));
     });
@@ -822,16 +822,16 @@ function renderHome() {
   const renewals = live('Orders').filter(o => o.stage === 'Live' && o.supportUntil && !o.supportRenewed && o.supportUntil <= addDays(td, 30)).sort((a, b) => a.supportUntil.localeCompare(b.supportUntil));
   const unsent = late.filter(d => remindedOn(d.o, d.r.n) !== td).length;
   let html = '';
-  if (!st.upiId) html += '<a class="banner" style="display:block;text-decoration:none;color:inherit" href="#more/business">⚙️ Business details aur UPI ID abhi baaki hain — invoice pe QR ke liye zaroori. Yahan tap karo.</a>';
-  if (parseDay(td).getDate() === 1 && late.length) html += '<div class="banner">📅 Aaj 1 tarikh hai — ' + late.length + ' EMI reminder' + (late.length > 1 ? 's' : '') + ' bhejne hain' + (unsent < late.length ? ' (' + (late.length - unsent) + ' bhej diye)' : '') + '.</div>';
-  html += '<div class="kpis"><div class="kpi green"><small>Is mahine collection</small><b>' + rs(monthPaid) + '</b></div><div class="kpi gold"><small>Total baaki (outstanding)</small><b>' + rs(outstanding) + '</b></div>' +
-    '<div class="kpi red"><small>Due / overdue abhi</small><b>' + rs(overdueAmt) + '</b></div><div class="kpi"><small>Chal rahe orders</small><b>' + active.length + '</b></div></div>';
-  html += '<div class="card"><h2>🔔 Reminders — aaj tak due <span class="cnt">' + late.length + '</span></h2>' + (late.length ? '<div class="list">' + late.map(dueRow).join('') + '</div>' : '<div class="empty">Koi payment due nahi hai 🎉</div>') + '</div>';
-  html += '<div class="card"><h2>🗓️ Agle 7 din <span class="cnt">' + soon.length + '</span></h2>' + (soon.length ? '<div class="list">' + soon.map(dueRow).join('') + '</div>' : '<div class="empty">Agle 7 din mein koi EMI nahi.</div>') + '</div>';
-  if (renewals.length) html += '<div class="card"><h2>🛠️ Support renewals <span class="cnt">' + renewals.length + '</span></h2><div class="list">' + renewals.map(o => { const c = clientOf(o); const past = o.supportUntil < td; return '<div class="row"><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(orderService(o)) + ' • support ' + (past ? 'khatam: ' : 'till ') + fmtDay(o.supportUntil) + '</small></div><button class="btn sm green wa" data-act="waSupport" data-id="' + o.id + '">' + WA_ICON + 'Remind</button></div>'; }).join('') + '</div></div>';
-  html += '<div class="card"><h2>🚧 Orders in progress <span class="cnt">' + active.length + '</span></h2>' + (active.length ? '<div class="list">' + active.map(orderRow).join('') + '</div>' : '<div class="empty">Abhi koi order chal nahi raha.</div>') + '</div>';
+  if (!st.upiId) html += '<a class="banner" style="display:block;text-decoration:none;color:inherit" href="#more/business">⚙️ Business details and UPI ID are not set yet — needed for the payment QR on invoices. Tap here.</a>';
+  if (parseDay(td).getDate() === 1 && late.length) html += '<div class="banner">📅 It is the 1st today — ' + late.length + ' EMI reminder' + (late.length > 1 ? 's' : '') + ' to send' + (unsent < late.length ? ' (' + (late.length - unsent) + ' sent)' : '') + '.</div>';
+  html += '<div class="kpis"><div class="kpi green"><small>Collected this month</small><b>' + rs(monthPaid) + '</b></div><div class="kpi gold"><small>Total outstanding</small><b>' + rs(outstanding) + '</b></div>' +
+    '<div class="kpi red"><small>Due / overdue now</small><b>' + rs(overdueAmt) + '</b></div><div class="kpi"><small>Orders in progress</small><b>' + active.length + '</b></div></div>';
+  html += '<div class="card"><h2>🔔 Reminders — due till today <span class="cnt">' + late.length + '</span></h2>' + (late.length ? '<div class="list">' + late.map(dueRow).join('') + '</div>' : '<div class="empty">No payments due 🎉</div>') + '</div>';
+  html += '<div class="card"><h2>🗓️ Next 7 days <span class="cnt">' + soon.length + '</span></h2>' + (soon.length ? '<div class="list">' + soon.map(dueRow).join('') + '</div>' : '<div class="empty">No EMIs in the next 7 days.</div>') + '</div>';
+  if (renewals.length) html += '<div class="card"><h2>🛠️ Support renewals <span class="cnt">' + renewals.length + '</span></h2><div class="list">' + renewals.map(o => { const c = clientOf(o); const past = o.supportUntil < td; return '<div class="row"><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(orderService(o)) + ' • support ' + (past ? 'ended ' : 'till ') + fmtDay(o.supportUntil) + '</small></div><button class="btn sm green wa" data-act="waSupport" data-id="' + o.id + '">' + WA_ICON + 'Remind</button></div>'; }).join('') + '</div></div>';
+  html += '<div class="card"><h2>🚧 Orders in progress <span class="cnt">' + active.length + '</span></h2>' + (active.length ? '<div class="list">' + active.map(orderRow).join('') + '</div>' : '<div class="empty">No orders in progress.</div>') + '</div>';
   if (enquiries.length) html += '<div class="card"><h2>💬 Enquiries <span class="cnt">' + enquiries.length + '</span></h2><div class="list">' + enquiries.map(orderRow).join('') + '</div></div>';
-  html += '<a class="btn block" href="#payments" style="margin-top:4px">📒 Saare payments dekho</a>';
+  html += '<a class="btn block" href="#payments" style="margin-top:4px">📒 View all payments</a>';
   view().innerHTML = html;
 }
 function dueRow(d) {
@@ -841,7 +841,7 @@ function dueRow(d) {
 }
 function orderRow(o) {
   const c = clientOf(o), s = orderState(o);
-  return '<a class="row" href="#order/' + o.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(o.orderNo) + ' • ' + esc(orderService(o)) + '</small><small>' + stageBadge(o.stage) + '</small></div><div class="amt">' + rs(s.total) + (s.balance > 0 && o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="red-t">Baaki ' + rs(s.balance) + '</small>' : o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="green-t">Fully paid</small>' : '') + '</div></a>';
+  return '<a class="row" href="#order/' + o.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(o.orderNo) + ' • ' + esc(orderService(o)) + '</small><small>' + stageBadge(o.stage) + '</small></div><div class="amt">' + rs(s.total) + (s.balance > 0 && o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="red-t">Due ' + rs(s.balance) + '</small>' : o.stage !== 'Enquiry' && o.stage !== 'Cancelled' ? '<small class="green-t">Fully paid</small>' : '') + '</div></a>';
 }
 
 /* ------------------------------------------------------------ ORDERS */
@@ -855,15 +855,15 @@ function renderOrders() {
   else if (orderFilter === 'Dues') list = list.filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry' && orderState(o).balance > 0);
   else if (orderFilter !== 'All') list = list.filter(o => o.stage === orderFilter);
   if (q) list = list.filter(o => (o.orderNo + ' ' + clientOf(o).name + ' ' + clientOf(o).business + ' ' + orderService(o)).toLowerCase().includes(q));
-  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="oq" placeholder="Order, client ya package dhoondo" value="' + esc(renderOrders.q || '') + '"></div>' +
+  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="oq" placeholder="Search order, client or package" value="' + esc(renderOrders.q || '') + '"></div>' +
     '<div class="seg">' + filters.map(f => '<button data-of="' + f + '" class="' + (f === orderFilter ? 'on' : '') + '">' + f + '</button>').join('') + '</div>' +
-    '<div class="card list">' + (list.length ? list.map(orderRow).join('') : '<div class="empty">Koi order nahi mila. Neeche “New” se naya order banao.</div>') + '</div>';
+    '<div class="card list">' + (list.length ? list.map(orderRow).join('') : '<div class="empty">No orders found. Tap “New” below to create one.</div>') + '</div>';
   $('#oq').oninput = e => { renderOrders.q = e.target.value; const pos = e.target.selectionStart; renderOrders(); const i = $('#oq'); i.focus(); i.setSelectionRange(pos, pos); };
   $$('[data-of]').forEach(b => b.onclick = () => { orderFilter = b.dataset.of; renderOrders(); });
 }
 
 function renderOrder(id) {
-  const o = get('Orders', id); if (!o) { view().innerHTML = '<div class="card empty">Order nahi mila.</div>'; setTitle('Order', true); return; }
+  const o = get('Orders', id); if (!o) { view().innerHTML = '<div class="card empty">Order not found.</div>'; setTitle('Order', true); return; }
   const c = clientOf(o), s = orderState(o), st = settings();
   setTitle(o.orderNo, true);
   const chk = checklistFor(o), done = o.checklist || {};
@@ -874,7 +874,7 @@ function renderOrder(id) {
     '<div class="btns grid2"><button class="btn green wa" data-act="waHello" data-id="' + c.id + '">' + WA_ICON + 'Message</button><a class="btn" href="#client/' + c.id + '">👤 Client</a></div></div>';
   // stage flow
   html += '<div class="card"><h2>Order flow</h2><div class="steps">' + STAGES.filter(x => x !== 'Cancelled').map((x, i) => '<button data-stage="' + esc(x) + '" class="' + (x === o.stage ? 'cur' : (o.stage !== 'Cancelled' && i < stageIdx ? 'done' : '')) + '">' + (o.stage !== 'Cancelled' && i < stageIdx ? '✓ ' : '') + esc(x) + '</button>').join('') + '</div>' +
-    (o.stage === 'Enquiry' ? '<div class="btns"><button class="btn green wa" data-act="waQuote" data-id="' + o.id + '">' + WA_ICON + 'Quotation bhejo</button><button class="btn gold" data-stage="Confirmed">✓ Confirm order</button></div>' : '') +
+    (o.stage === 'Enquiry' ? '<div class="btns"><button class="btn green wa" data-act="waQuote" data-id="' + o.id + '">' + WA_ICON + 'Send quotation</button><button class="btn gold" data-stage="Confirmed">✓ Confirm order</button></div>' : '') +
     (o.stage === 'Live' && o.supportUntil ? '<p class="tiny" style="margin:8px 0 0">Live: ' + fmtDay(o.liveDate) + ' • Free support till <b>' + fmtDay(o.supportUntil) + '</b>' + (o.supportRenewed ? ' • renewed' : '') + '</p>' : '') +
     (chk.length ? '<hr class="s"><h2 style="margin-bottom:4px">Checklist <span class="cnt">' + nDone + '/' + chk.length + '</span></h2><div class="pbar"><i style="width:' + (chk.length ? nDone / chk.length * 100 : 0) + '%"></i></div>' + chk.map(k => '<label class="chk"><input type="checkbox" data-chk="' + esc(k) + '"' + (done[k] ? ' checked' : '') + '><span>' + esc(k) + '</span></label>').join('') : '') + '</div>';
   // items
@@ -883,23 +883,23 @@ function renderOrder(id) {
   // payments
   if (o.stage !== 'Enquiry') {
     html += '<div class="card"><h2>Payment ' + ((o.plan || {}).mode === 'emi' ? '— 0% EMI' : '— Full') + '</h2>' +
-      '<div class="pbar"><i style="width:' + (s.total ? Math.min(100, s.paid / s.total * 100) : 0) + '%"></i></div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="green-t">Paid ' + rs(s.paid) + '</span><span class="' + (s.balance > 0 ? 'red-t' : 'green-t') + '">Baaki ' + rs(s.balance) + '</span></div>' +
-      (s.extraPaid ? '<p class="tiny red-t">Note: ' + rs(s.extraPaid) + ' total se zyada aaya hai.</p>' : '') +
-      '<table class="sch" style="margin-top:10px"><thead><tr><th>Kisht</th><th>Due</th><th class="r">Amount</th><th>Status</th><th></th></tr></thead><tbody>' +
-      s.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtShort(r.due) + '</td><td class="r">' + rs(r.amount) + (r.paid > 0 && r.status !== 'paid' ? '<br><small class="muted">baaki ' + rs(r.pending) + '</small>' : '') + '</td><td>' + statusBadge(r.status) + (remindedOn(o, r.n) && r.status !== 'paid' ? '<br><small class="muted">sent ' + fmtShort(remindedOn(o, r.n)) + '</small>' : '') + '</td><td class="r">' + (r.status !== 'paid' && o.stage !== 'Cancelled' ? '<button class="btn sm green wa" data-act="waRemind" data-id="' + o.id + '" data-n="' + r.n + '" aria-label="WhatsApp reminder">' + WA_ICON + '</button>' : '') + '</td></tr>').join('') +
-      '</tbody></table><div class="btns grid2" style="margin-top:12px"><button class="btn gold" data-act="pay" data-id="' + o.id + '" data-amt="' + (s.next ? s.next.pending : 0) + '">₹ Payment add karo</button><button class="btn" data-act="invoice" data-id="' + o.id + '">🧾 Invoice PDF</button></div>' +
-      (pays.length ? '<hr class="s"><h2>Payments mile <span class="cnt">' + pays.length + '</span></h2><div class="list">' + pays.map(payRow).join('') + '</div>' : '') + '</div>';
+      '<div class="pbar"><i style="width:' + (s.total ? Math.min(100, s.paid / s.total * 100) : 0) + '%"></i></div><div style="display:flex;justify-content:space-between;font-size:13px"><span class="green-t">Paid ' + rs(s.paid) + '</span><span class="' + (s.balance > 0 ? 'red-t' : 'green-t') + '">Due ' + rs(s.balance) + '</span></div>' +
+      (s.extraPaid ? '<p class="tiny red-t">Note: ' + rs(s.extraPaid) + ' received over the order total.</p>' : '') +
+      '<table class="sch" style="margin-top:10px"><thead><tr><th>Instalment</th><th>Due</th><th class="r">Amount</th><th>Status</th><th></th></tr></thead><tbody>' +
+      s.rows.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtShort(r.due) + '</td><td class="r">' + rs(r.amount) + (r.paid > 0 && r.status !== 'paid' ? '<br><small class="muted">' + rs(r.pending) + ' left</small>' : '') + '</td><td>' + statusBadge(r.status) + (remindedOn(o, r.n) && r.status !== 'paid' ? '<br><small class="muted">sent ' + fmtShort(remindedOn(o, r.n)) + '</small>' : '') + '</td><td class="r">' + (r.status !== 'paid' && o.stage !== 'Cancelled' ? '<button class="btn sm green wa" data-act="waRemind" data-id="' + o.id + '" data-n="' + r.n + '" aria-label="WhatsApp reminder">' + WA_ICON + '</button>' : '') + '</td></tr>').join('') +
+      '</tbody></table><div class="btns grid2" style="margin-top:12px"><button class="btn gold" data-act="pay" data-id="' + o.id + '" data-amt="' + (s.next ? s.next.pending : 0) + '">₹ Add payment</button><button class="btn" data-act="invoice" data-id="' + o.id + '">🧾 Invoice PDF</button></div>' +
+      (pays.length ? '<hr class="s"><h2>Payments received <span class="cnt">' + pays.length + '</span></h2><div class="list">' + pays.map(payRow).join('') + '</div>' : '') + '</div>';
   }
   if (o.notes) html += '<div class="card"><h2>Notes</h2><div style="white-space:pre-wrap;font-size:14px">' + esc(o.notes) + '</div></div>';
   html += '<div class="btns grid2"><a class="btn" href="#new/' + o.id + '">✏️ Edit order</a>' + (o.stage === 'Cancelled' ? '<button class="btn red" data-act="delOrder" data-id="' + o.id + '">🗑 Delete</button>' : '<button class="btn red" data-stage="Cancelled">✕ Cancel order</button>') + '</div>';
-  if (o.stage === 'Live' && hasSupportable(o)) html += '<button class="btn block" style="margin-top:8px" data-act="renew" data-id="' + o.id + '">🛠️ Support renewal order banao (' + rs(st.supportFee) + ')</button>';
+  if (o.stage === 'Live' && hasSupportable(o)) html += '<button class="btn block" style="margin-top:8px" data-act="renew" data-id="' + o.id + '">🛠️ Create support renewal order (' + rs(st.supportFee) + ')</button>';
   view().innerHTML = html;
   $$('[data-stage]').forEach(b => b.onclick = () => setStage(o, b.dataset.stage));
   $$('[data-chk]').forEach(cb => cb.onchange = async () => { const r = get('Orders', o.id); r.checklist = Object.assign({}, r.checklist || {}, { [cb.dataset.chk]: cb.checked }); await saveOne('Orders', r); renderOrder(o.id); });
 }
 async function setStage(o, stage) {
   if (stage === o.stage) return;
-  if (stage === 'Cancelled' && !(await confirmBox('Ye order cancel karna hai? Iske reminders band ho jaayenge.', 'Cancel order', true))) return;
+  if (stage === 'Cancelled' && !(await confirmBox('Cancel this order? Its reminders will stop.', 'Cancel order', true))) return;
   const r = get('Orders', o.id); r.stage = stage;
   if (stage === 'Live' && !r.liveDate) { r.liveDate = today(); if (hasSupportable(r)) r.supportUntil = addYear(r.liveDate); }
   await saveOne('Orders', r);
@@ -921,33 +921,33 @@ function renderNew(editId) {
     draft._for = editId || 'new';
     if (!editing && renderNew.preClient) { draft.clientId = renderNew.preClient; renderNew.preClient = null; }
   }
-  setTitle(editing ? 'Edit ' + editing.orderNo : 'Naya order', !!editing);
+  setTitle(editing ? 'Edit ' + editing.orderNo : 'New order', !!editing);
   const st = settings(), d = draft;
   const clients = live('Clients').sort((a, b) => a.name.localeCompare(b.name));
   const qtyOf = code => { const it = d.items.find(i => i.code === code); return it ? P(it.qty) : 0; };
   const priceOf = (code, def) => { const it = d.items.find(i => i.code === code); return it ? P(it.price) : def; };
-  const groups = [['shop', '🛍️ QR Digital Shop'], ['billing', '🧾 Billing & Inventory App'], ['addon', '📸 Add-ons'], ['support', '🛠️ Support'], ['custom', '✦ Custom work (price daalo)']];
+  const groups = [['shop', '🛍️ QR Digital Shop'], ['billing', '🧾 Billing & Inventory App'], ['addon', '📸 Add-ons'], ['support', '🛠️ Support'], ['custom', '✦ Custom work (enter price)']];
   const t = orderTotals(d);
   const sch = buildSchedule(d);
-  let html = '<div class="card"><h2>1. Client</h2><label class="f"><span>Client chuno</span><select class="i" id="nClient"><option value="">— Client select karo —</option>' + clients.map(c => '<option value="' + c.id + '"' + (c.id === d.clientId ? ' selected' : '') + '>' + esc(c.name) + (c.business ? ' — ' + esc(c.business) : '') + '</option>').join('') + '</select></label><button class="btn sm" type="button" id="nNewClient">＋ Naya client</button></div>';
+  let html = '<div class="card"><h2>1. Client</h2><label class="f"><span>Select client</span><select class="i" id="nClient"><option value="">— Select a client —</option>' + clients.map(c => '<option value="' + c.id + '"' + (c.id === d.clientId ? ' selected' : '') + '>' + esc(c.name) + (c.business ? ' — ' + esc(c.business) : '') + '</option>').join('') + '</select></label><button class="btn sm" type="button" id="nNewClient">＋ New client</button></div>';
   html += '<div class="card"><h2>2. Packages</h2>' + groups.map(([g, label]) => {
     const items = st.catalog.filter(c => c.group === g); if (!items.length) return '';
     return '<div class="tiny" style="margin:6px 0;font-weight:700">' + label + '</div>' + items.map(c => {
       const q = qtyOf(c.code), price = priceOf(c.code, c.price), multi = g === 'addon' || g === 'support' || g === 'custom';
       if (g === 'shop' || g === 'billing') return '<div class="pk' + (q ? ' on' : '') + '" data-pick="' + c.code + '"><div class="main"><b>' + esc(c.name) + '</b><small>' + rs(c.price) + '</small></div><input type="radio" name="g_' + g + '"' + (q ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:#d7a83d"></div>';
-      return '<div class="pk' + (q ? ' on' : '') + '"><div class="main"><b>' + esc(c.name) + '</b><small>' + (c.unit ? 'per ' + esc(c.unit) : 'price apne hisaab se') + '</small></div><div class="qty"><button type="button" data-q="' + c.code + '" data-d="-1">−</button><b style="min-width:18px;text-align:center">' + q + '</b><button type="button" data-q="' + c.code + '" data-d="1">+</button>' + (multi ? '<input type="number" inputmode="numeric" min="0" step="1" data-p="' + c.code + '" value="' + (price || '') + '" placeholder="₹">' : '') + '</div></div>';
+      return '<div class="pk' + (q ? ' on' : '') + '"><div class="main"><b>' + esc(c.name) + '</b><small>' + (c.unit ? 'per ' + esc(c.unit) : 'set your own price') + '</small></div><div class="qty"><button type="button" data-q="' + c.code + '" data-d="-1">−</button><b style="min-width:18px;text-align:center">' + q + '</b><button type="button" data-q="' + c.code + '" data-d="1">+</button>' + (multi ? '<input type="number" inputmode="numeric" min="0" step="1" data-p="' + c.code + '" value="' + (price || '') + '" placeholder="₹">' : '') + '</div></div>';
     }).join('');
   }).join('') +
     '<label class="f" style="margin-top:10px"><span>Extra discount (₹)</span><input class="i" type="number" inputmode="numeric" min="0" id="nDisc" value="' + (P(d.extraDiscount) || '') + '" placeholder="0"></label>' +
-    (t.combo || d.noCombo ? '<label class="chk"><input type="checkbox" id="nNoCombo"' + (d.noCombo ? '' : ' checked') + '><span>Combo discount lagao (' + rs(st.comboDiscount) + ' off — Digital Shop + Billing)</span></label>' : '') +
+    (t.combo || d.noCombo ? '<label class="chk"><input type="checkbox" id="nNoCombo"' + (d.noCombo ? '' : ' checked') + '><span>Apply combo discount (' + rs(st.comboDiscount) + ' off — Digital Shop + Billing)</span></label>' : '') +
     '<div class="sum"><div><span>Subtotal</span><span>' + rs(t.subtotal) + '</span></div>' + (t.combo ? '<div class="green-t"><span>Combo discount</span><span>− ' + rs(t.combo) + '</span></div>' : '') + (t.extra ? '<div class="green-t"><span>Discount</span><span>− ' + rs(t.extra) + '</span></div>' : '') + '<div class="tot"><span>Total</span><span>' + rs(t.total) + '</span></div></div></div>';
   html += '<div class="card"><h2>3. Payment</h2><div class="seg"><button type="button" data-mode="full" class="' + (d.plan.mode !== 'emi' ? 'on' : '') + '">Full payment</button><button type="button" data-mode="emi" class="' + (d.plan.mode === 'emi' ? 'on' : '') + '">EMI (0% interest)</button></div>' +
-    (d.plan.mode === 'emi' ? '<div class="two"><label class="f"><span>Advance / down payment (₹)</span><input class="i" type="number" inputmode="numeric" min="0" id="nDown" value="' + (P(d.plan.down) || '') + '" placeholder="0 = poora EMI"></label><label class="f"><span>Kitne mahine (1–' + MAX_EMI + ')</span><select class="i" id="nMonths">' + Array.from({ length: MAX_EMI }, (_, i) => i + 1).map(m => '<option' + (m === P(d.plan.months) ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></label></div>' +
-      '<label class="f"><span>Pehli EMI kis mahine ki 1 tarikh?</span><input class="i" type="month" id="nStart" value="' + esc((d.plan.start || firstOfNextMonth(d.date)).slice(0, 7)) + '"></label>' : '') +
-    (t.total > 0 ? '<table class="sch"><thead><tr><th>Kisht</th><th>Due date</th><th class="r">Amount</th></tr></thead><tbody>' + sch.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtDay(r.due) + '</td><td class="r">' + rs(r.amount) + '</td></tr>').join('') + '</tbody></table><p class="tiny" style="margin:8px 0 0">Total ' + rs(sch.reduce((a, r) => a + r.amount, 0)) + ' = order total ' + rs(t.total) + ' ✓ • koi interest nahi</p>' : '<div class="empty">Pehle package chuno.</div>') + '</div>';
+    (d.plan.mode === 'emi' ? '<div class="two"><label class="f"><span>Advance / down payment (₹)</span><input class="i" type="number" inputmode="numeric" min="0" id="nDown" value="' + (P(d.plan.down) || '') + '" placeholder="0 = full amount on EMI"></label><label class="f"><span>Number of months (1–' + MAX_EMI + ')</span><select class="i" id="nMonths">' + Array.from({ length: MAX_EMI }, (_, i) => i + 1).map(m => '<option' + (m === P(d.plan.months) ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></label></div>' +
+      '<label class="f"><span>First EMI on the 1st of which month?</span><input class="i" type="month" id="nStart" value="' + esc((d.plan.start || firstOfNextMonth(d.date)).slice(0, 7)) + '"></label>' : '') +
+    (t.total > 0 ? '<table class="sch"><thead><tr><th>Instalment</th><th>Due date</th><th class="r">Amount</th></tr></thead><tbody>' + sch.map(r => '<tr><td>' + esc(r.label) + '</td><td>' + fmtDay(r.due) + '</td><td class="r">' + rs(r.amount) + '</td></tr>').join('') + '</tbody></table><p class="tiny" style="margin:8px 0 0">Total ' + rs(sch.reduce((a, r) => a + r.amount, 0)) + ' = order total ' + rs(t.total) + ' ✓ • no interest</p>' : '<div class="empty">Select a package first.</div>') + '</div>';
   html += '<div class="card"><h2>4. Details</h2><div class="two"><label class="f"><span>Order date</span><input class="i" type="date" id="nDate" value="' + esc(d.date) + '"></label><label class="f"><span>Stage</span><select class="i" id="nStage">' + STAGES.map(x => '<option' + (x === d.stage ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></label></div>' +
     '<label class="f"><span>Notes (optional)</span><textarea class="i" id="nNotes" placeholder="Requirements, colours, deadline…">' + esc(d.notes || '') + '</textarea></label></div>';
-  html += '<div class="btns grid2"><button class="btn" type="button" id="nCancel">Cancel</button><button class="btn gold" type="button" id="nSave">' + (editing ? 'Save changes' : 'Order save karo') + '</button></div>';
+  html += '<div class="btns grid2"><button class="btn" type="button" id="nCancel">Cancel</button><button class="btn gold" type="button" id="nSave">' + (editing ? 'Save changes' : 'Save order') + '</button></div>';
   view().innerHTML = html;
 
   const rerender = () => { const y = window.scrollY; renderNew(editId); window.scrollTo(0, y); };
@@ -983,18 +983,18 @@ function renderNew(editId) {
   $('#nCancel').onclick = () => { draft = null; location.hash = editing ? '#order/' + editing.id : '#home'; };
   $('#nSave').onclick = async () => {
     const tt = orderTotals(d);
-    if (!d.clientId) { toast('Client chuno'); return; }
-    if (!d.items.some(i => P(i.qty) > 0)) { toast('Kam se kam ek package chuno'); return; }
-    if (d.items.some(i => P(i.qty) > 0 && !(P(i.price) > 0))) { toast('Custom item ka price daalo'); return; }
-    if (d.plan.mode === 'emi' && P(d.plan.down) > tt.total) { toast('Advance total se zyada nahi ho sakta'); return; }
-    if (editing) { const paid = paidFor(editing); if (paid > tt.total && !(await confirmBox('Is order pe ' + rs(paid) + ' pehle hi mil chuka hai, jo naye total ' + rs(tt.total) + ' se zyada hai. Phir bhi save karna hai?', 'Save'))) return; }
+    if (!d.clientId) { toast('Select a client'); return; }
+    if (!d.items.some(i => P(i.qty) > 0)) { toast('Select at least one package'); return; }
+    if (d.items.some(i => P(i.qty) > 0 && !(P(i.price) > 0))) { toast('Enter a price for the custom item'); return; }
+    if (d.plan.mode === 'emi' && P(d.plan.down) > tt.total) { toast('Advance cannot be more than the total'); return; }
+    if (editing) { const paid = paidFor(editing); if (paid > tt.total && !(await confirmBox(rs(paid) + ' has already been received on this order, which is more than the new total ' + rs(tt.total) + '. Save anyway?', 'Save'))) return; }
     const rec = JSON.parse(JSON.stringify(d)); delete rec._for;
     rec.items = rec.items.filter(i => P(i.qty) > 0);
     if (rec.plan.mode === 'emi') { rec.plan.down = R(P(rec.plan.down)); rec.plan.months = Math.min(MAX_EMI, Math.max(1, P(rec.plan.months))); rec.plan.start = rec.plan.start || firstOfNextMonth(rec.date); }
     if (rec.stage === 'Live' && !rec.liveDate) { rec.liveDate = today(); if (hasSupportable(rec)) rec.supportUntil = addYear(rec.liveDate); }
     if (!editing) { await syncIfPossible(); rec.orderNo = nextNumber('order'); }
     await saveOne('Orders', rec, !editing);
-    draft = null; toast(editing ? 'Order update ho gaya' : 'Order ' + rec.orderNo + ' save ho gaya');
+    draft = null; toast(editing ? 'Order updated' : 'Order ' + rec.orderNo + ' saved');
     location.hash = '#order/' + rec.id;
   };
 }
@@ -1005,17 +1005,17 @@ function renderClients() {
   const q = (renderClients.q || '').toLowerCase();
   let list = live('Clients').sort((a, b) => a.name.localeCompare(b.name));
   if (q) list = list.filter(c => (c.name + ' ' + (c.business || '') + ' ' + (c.phone || '') + ' ' + (c.city || '')).toLowerCase().includes(q));
-  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="cq" placeholder="Naam, business ya number" value="' + esc(renderClients.q || '') + '"></div>' +
+  view().innerHTML = '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="i" id="cq" placeholder="Search name, business or number" value="' + esc(renderClients.q || '') + '"></div>' +
     '<div class="card list">' + (list.length ? list.map(c => { const os = live('Orders').filter(o => o.clientId === c.id && o.stage !== 'Cancelled' && o.stage !== 'Enquiry'); const bal = R(os.reduce((s, o) => s + orderState(o).balance, 0));
-      return '<a class="row" href="#client/' + c.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(c.business || '') + (c.business && c.phone ? ' • ' : '') + esc(c.phone || '') + '</small></div><div class="amt">' + (bal > 0 ? '<span class="red-t">' + rs(bal) + '</span><small>baaki</small>' : '<small>' + os.length + ' order' + (os.length === 1 ? '' : 's') + '</small>') + '</div></a>'; }).join('') : '<div class="empty">Koi client nahi. Naya client add karo.</div>') + '</div>' +
+      return '<a class="row" href="#client/' + c.id + '"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><b>' + esc(c.name) + '</b><small>' + esc(c.business || '') + (c.business && c.phone ? ' • ' : '') + esc(c.phone || '') + '</small></div><div class="amt">' + (bal > 0 ? '<span class="red-t">' + rs(bal) + '</span><small>due</small>' : '<small>' + os.length + ' order' + (os.length === 1 ? '' : 's') + '</small>') + '</div></a>'; }).join('') : '<div class="empty">No clients yet. Add your first client.</div>') + '</div>' +
     '<button class="btn gold fab" id="addClient">＋ Client</button>';
   $('#cq').oninput = e => { renderClients.q = e.target.value; const pos = e.target.selectionStart; renderClients(); const i = $('#cq'); i.focus(); i.setSelectionRange(pos, pos); };
   $('#addClient').onclick = () => clientForm(null, c => { location.hash = '#client/' + c.id; });
 }
 function clientForm(c, after) {
   const isNew = !c;
-  sheet(isNew ? 'Naya client' : 'Client edit', '<form id="cf"><label class="f"><span>Naam *</span><input class="i" name="name" required maxlength="60" value="' + esc(c ? c.name : '') + '"></label>' +
-    '<label class="f"><span>Business / shop ka naam</span><input class="i" name="business" maxlength="80" value="' + esc(c ? c.business : '') + '"></label>' +
+  sheet(isNew ? 'New client' : 'Edit client', '<form id="cf"><label class="f"><span>Name *</span><input class="i" name="name" required maxlength="60" value="' + esc(c ? c.name : '') + '"></label>' +
+    '<label class="f"><span>Business / shop name</span><input class="i" name="business" maxlength="80" value="' + esc(c ? c.business : '') + '"></label>' +
     '<label class="f"><span>WhatsApp number *</span><input class="i" name="phone" required inputmode="tel" maxlength="16" placeholder="10 digit" value="' + esc(c ? c.phone : '') + '"></label>' +
     '<label class="f"><span>City / address</span><input class="i" name="city" maxlength="140" value="' + esc(c ? c.city : '') + '"></label>' +
     '<label class="f"><span>Notes</span><textarea class="i" name="notes" style="min-height:70px">' + esc(c ? c.notes : '') + '</textarea></label>' +
@@ -1023,17 +1023,17 @@ function clientForm(c, after) {
     $('#cf', el).onsubmit = async e => {
       e.preventDefault(); const f = new FormData(e.target);
       const phone = digits(f.get('phone'));
-      if (!(phone.length === 10 || (phone.length === 12 && phone.startsWith('91')) || (phone.length === 11 && phone.startsWith('0')))) { $('#cferr', el).textContent = 'Sahi 10 digit mobile number daalo'; return; }
+      if (!(phone.length === 10 || (phone.length === 12 && phone.startsWith('91')) || (phone.length === 11 && phone.startsWith('0')))) { $('#cferr', el).textContent = 'Enter a valid 10-digit mobile number'; return; }
       const dup = live('Clients').find(x => waNumber(x.phone) === waNumber(phone) && (!c || x.id !== c.id));
-      if (dup) { $('#cferr', el).textContent = 'Ye number pehle se ' + dup.name + ' ke naam pe hai'; return; }
+      if (dup) { $('#cferr', el).textContent = 'This number already belongs to ' + dup.name; return; }
       const rec = c ? get('Clients', c.id) : { id: uid() };
       rec.name = String(f.get('name')).trim(); rec.business = String(f.get('business')).trim(); rec.phone = phone.slice(-10); rec.city = String(f.get('city')).trim(); rec.notes = String(f.get('notes')).trim();
-      await saveOne('Clients', rec, isNew); close(); toast('Client save ho gaya'); if (after) after(rec); else render();
+      await saveOne('Clients', rec, isNew); close(); toast('Client saved'); if (after) after(rec); else render();
     };
   });
 }
 function renderClient(id) {
-  const c = get('Clients', id); if (!c) { setTitle('Client', true); view().innerHTML = '<div class="card empty">Client nahi mila.</div>'; return; }
+  const c = get('Clients', id); if (!c) { setTitle('Client', true); view().innerHTML = '<div class="card empty">Client not found.</div>'; return; }
   setTitle(c.name, true);
   const orders = live('Orders').filter(o => o.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
   const billed = orders.filter(o => o.stage !== 'Cancelled' && o.stage !== 'Enquiry');
@@ -1041,14 +1041,14 @@ function renderClient(id) {
   const pays = live('Payments').filter(p => p.clientId === id).sort((a, b) => b.date.localeCompare(a.date));
   view().innerHTML = '<div class="card"><div class="hd"><div class="av">' + esc(initials(c.name)) + '</div><div class="main"><h3>' + esc(c.name) + '</h3><small>' + esc(c.business || '') + '</small><small style="display:block">' + esc(fmtPhone(c.phone)) + (c.city ? ' • ' + esc(c.city) : '') + '</small></div></div>' +
     (c.notes ? '<p class="tiny" style="white-space:pre-wrap">' + esc(c.notes) + '</p>' : '') +
-    '<div class="btns grid2"><button class="btn green wa" data-act="waHello" data-id="' + c.id + '">' + WA_ICON + 'WhatsApp</button><a class="btn" href="tel:+' + waNumber(c.phone) + '">📞 Call</a><button class="btn gold" id="cNewOrder">＋ Naya order</button><button class="btn" id="cEdit">✏️ Edit</button></div></div>' +
-    '<div class="kpis"><div class="kpi"><small>Total billed</small><b>' + rs(total) + '</b></div><div class="kpi ' + (bal > 0 ? 'red' : 'green') + '"><small>Baaki</small><b>' + rs(bal) + '</b></div></div>' +
-    '<div class="card list"><h2>Orders <span class="cnt">' + orders.length + '</span></h2>' + (orders.length ? orders.map(orderRow).join('') : '<div class="empty">Abhi koi order nahi.</div>') + '</div>' +
-    '<div class="card list"><h2>Payments <span class="cnt">' + pays.length + '</span> <span class="tiny" style="margin-left:auto">Paid ' + rs(paid) + '</span></h2>' + (pays.length ? pays.map(payRow).join('') : '<div class="empty">Abhi koi payment nahi.</div>') + '</div>' +
-    (orders.length ? '' : '<button class="btn red block" id="cDel">🗑 Client delete karo</button>');
+    '<div class="btns grid2"><button class="btn green wa" data-act="waHello" data-id="' + c.id + '">' + WA_ICON + 'WhatsApp</button><a class="btn" href="tel:+' + waNumber(c.phone) + '">📞 Call</a><button class="btn gold" id="cNewOrder">＋ New order</button><button class="btn" id="cEdit">✏️ Edit</button></div></div>' +
+    '<div class="kpis"><div class="kpi"><small>Total billed</small><b>' + rs(total) + '</b></div><div class="kpi ' + (bal > 0 ? 'red' : 'green') + '"><small>Due</small><b>' + rs(bal) + '</b></div></div>' +
+    '<div class="card list"><h2>Orders <span class="cnt">' + orders.length + '</span></h2>' + (orders.length ? orders.map(orderRow).join('') : '<div class="empty">No orders yet.</div>') + '</div>' +
+    '<div class="card list"><h2>Payments <span class="cnt">' + pays.length + '</span> <span class="tiny" style="margin-left:auto">Paid ' + rs(paid) + '</span></h2>' + (pays.length ? pays.map(payRow).join('') : '<div class="empty">No payments yet.</div>') + '</div>' +
+    (orders.length ? '' : '<button class="btn red block" id="cDel">🗑 Delete client</button>');
   $('#cEdit').onclick = () => clientForm(c, () => renderClient(id));
   $('#cNewOrder').onclick = () => { draft = null; renderNew.preClient = id; location.hash = '#new'; };
-  if ($('#cDel')) $('#cDel').onclick = async () => { if (await confirmBox('Client ' + c.name + ' ko delete karna hai?', 'Delete', true)) { await remove('Clients', get('Clients', id)); toast('Client delete ho gaya'); location.hash = '#clients'; } };
+  if ($('#cDel')) $('#cDel').onclick = async () => { if (await confirmBox('Delete client ' + c.name + '?', 'Delete', true)) { await remove('Clients', get('Clients', id)); toast('Client deleted'); location.hash = '#clients'; } };
 }
 
 /* ------------------------------------------------------------ PAYMENTS */
@@ -1056,26 +1056,26 @@ function payForm(orderId, amount, existing) {
   const o = get('Orders', orderId || (existing && existing.orderId)); if (!o) return;
   const c = clientOf(o), s = orderState(o);
   const p = existing || { date: today(), amount: amount || (s.next ? s.next.pending : s.balance), method: 'UPI', reference: '', note: '' };
-  sheet(existing ? 'Payment edit' : 'Payment mila', '<p class="tiny" style="margin-top:-6px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • baaki ' + rs(s.balance) + '</p><form id="pf">' +
+  sheet(existing ? 'Edit payment' : 'Payment received', '<p class="tiny" style="margin-top:-6px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • due ' + rs(s.balance) + '</p><form id="pf">' +
     '<div class="two"><label class="f"><span>Amount (₹) *</span><input class="i" name="amount" type="number" inputmode="decimal" min="1" step="0.01" required value="' + (P(p.amount) || '') + '"></label><label class="f"><span>Date</span><input class="i" name="date" type="date" required value="' + esc(p.date) + '"></label></div>' +
     '<label class="f"><span>Method</span><select class="i" name="method">' + METHODS.map(m => '<option' + (m === p.method ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></label>' +
     '<label class="f"><span>UTR / reference (optional)</span><input class="i" name="reference" maxlength="40" value="' + esc(p.reference || '') + '"></label>' +
     '<div class="btns grid2" style="margin-top:12px">' + (existing ? '<button class="btn red" type="button" id="pDel">Delete</button>' : '<button class="btn" type="button" data-close>Cancel</button>') + '<button class="btn gold" type="submit">Save</button></div></form>', (el, close) => {
     $('#pf', el).onsubmit = async e => {
       e.preventDefault(); const f = new FormData(e.target);
-      const amt = R(f.get('amount')); if (!(amt > 0)) { toast('Amount daalo'); return; }
+      const amt = R(f.get('amount')); if (!(amt > 0)) { toast('Enter an amount'); return; }
       const rec = existing ? get('Payments', existing.id) : { id: uid(), orderId: o.id, clientId: o.clientId };
       rec.amount = amt; rec.date = String(f.get('date')) || today(); rec.method = String(f.get('method')); rec.reference = String(f.get('reference')).trim();
       await saveOne('Payments', rec, !existing); close();
       const after = orderState(get('Orders', o.id));
       render();
-      if (existing) { toast('Payment update ho gaya • baaki ' + rs(after.balance)); return; }
-      sheet('Payment save ho gaya ✅', '<p style="margin:0 0 6px;font-size:22px;font-weight:800;color:#7ee6ac">' + rs(amt) + '</p><p class="tiny" style="margin:0 0 16px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • baaki ' + rs(after.balance) + (after.next ? ' • agli kisht ' + rs(after.next.pending) + ' on ' + fmtDay(after.next.due) : '') + '</p>' +
-        '<div class="btns grid2"><button class="btn" data-close type="button">Baad mein</button><button class="btn green wa" type="button" id="sendRc">' + WA_ICON + 'Receipt bhejo</button></div>', (el2, close2) => {
+      if (existing) { toast('Payment updated • due ' + rs(after.balance)); return; }
+      sheet('Payment saved ✅', '<p style="margin:0 0 6px;font-size:22px;font-weight:800;color:#7ee6ac">' + rs(amt) + '</p><p class="tiny" style="margin:0 0 16px">' + esc(c.name) + ' • ' + esc(o.orderNo) + ' • due ' + rs(after.balance) + (after.next ? ' • next instalment ' + rs(after.next.pending) + ' on ' + fmtDay(after.next.due) : '') + '</p>' +
+        '<div class="btns grid2"><button class="btn" data-close type="button">Later</button><button class="btn green wa" type="button" id="sendRc">' + WA_ICON + 'Send receipt</button></div>', (el2, close2) => {
         $('#sendRc', el2).onclick = async () => { close2(); await sendReceipt(get('Payments', rec.id)); };
       });
     };
-    if ($('#pDel', el)) $('#pDel', el).onclick = async () => { if (await confirmBox('Ye payment delete karna hai?', 'Delete', true)) { const r = get('Payments', existing.id); await remove('Payments', r); const rc = live('Invoices').find(i => i.kind === 'receipt' && i.paymentId === r.id); if (rc) await remove('Invoices', rc); close(); toast('Payment delete ho gaya'); render(); } };
+    if ($('#pDel', el)) $('#pDel', el).onclick = async () => { if (await confirmBox('Delete this payment?', 'Delete', true)) { const r = get('Payments', existing.id); await remove('Payments', r); const rc = live('Invoices').find(i => i.kind === 'receipt' && i.paymentId === r.id); if (rc) await remove('Invoices', rc); close(); toast('Payment deleted'); render(); } };
   });
 }
 let payMonth = '';
@@ -1085,10 +1085,10 @@ function renderPayments() {
   const list = live('Payments').filter(p => String(p.date).startsWith(payMonth)).sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
   const sum = R(list.reduce((s, p) => s + P(p.amount), 0));
   const byM = {}; list.forEach(p => { byM[p.method] = R((byM[p.method] || 0) + P(p.amount)); });
-  view().innerHTML = '<div class="card"><div class="two"><label class="f" style="margin:0"><span>Mahina</span><input class="i" type="month" id="pm" value="' + payMonth + '"></label><div><span class="tiny" style="display:block;margin-bottom:5px;font-weight:700">Total</span><b style="font-size:24px;color:#7ee6ac">' + rs(sum) + '</b></div></div>' +
+  view().innerHTML = '<div class="card"><div class="two"><label class="f" style="margin:0"><span>Month</span><input class="i" type="month" id="pm" value="' + payMonth + '"></label><div><span class="tiny" style="display:block;margin-bottom:5px;font-weight:700">Total</span><b style="font-size:24px;color:#7ee6ac">' + rs(sum) + '</b></div></div>' +
     (Object.keys(byM).length ? '<p class="tiny" style="margin:10px 0 0">' + Object.entries(byM).map(([m, v]) => esc(m) + ': ' + rs(v)).join(' • ') + '</p>' : '') + '</div>' +
-    '<div class="card list">' + (list.length ? list.map(payRow).join('') : '<div class="empty">Is mahine koi payment nahi.</div>') + '</div>' +
-    '<button class="btn block" id="pcsv">⬇️ Is mahine ka CSV</button>';
+    '<div class="card list">' + (list.length ? list.map(payRow).join('') : '<div class="empty">No payments this month.</div>') + '</div>' +
+    '<button class="btn block" id="pcsv">⬇️ Download this month as CSV</button>';
   $('#pm').onchange = e => { payMonth = e.target.value || today().slice(0, 7); renderPayments(); };
   $('#pcsv').onclick = () => {
     const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
@@ -1103,87 +1103,87 @@ function renderMore(sub) {
   const st = settings();
   if (sub === 'business') {
     setTitle('Business details', true);
-    view().innerHTML = '<form class="card" id="bf"><label class="f"><span>Business ka naam</span><input class="i" name="business" value="' + esc(st.business) + '"></label>' +
-      '<label class="f"><span>Tagline (invoice pe)</span><input class="i" name="tagline" value="' + esc(st.tagline) + '"></label>' +
+    view().innerHTML = '<form class="card" id="bf"><label class="f"><span>Business name</span><input class="i" name="business" value="' + esc(st.business) + '"></label>' +
+      '<label class="f"><span>Tagline (on invoices)</span><input class="i" name="tagline" value="' + esc(st.tagline) + '"></label>' +
       '<div class="two"><label class="f"><span>WhatsApp / phone</span><input class="i" name="phone" inputmode="tel" value="' + esc(st.phone) + '"></label><label class="f"><span>Email</span><input class="i" name="email" type="email" value="' + esc(st.email) + '"></label></div>' +
-      '<label class="f"><span>Address (invoice pe)</span><input class="i" name="address" value="' + esc(st.address) + '"></label>' +
-      '<div class="two"><label class="f"><span>UPI ID *</span><input class="i" name="upiId" placeholder="name@okaxis" value="' + esc(st.upiId) + '"></label><label class="f"><span>UPI pe naam</span><input class="i" name="upiName" value="' + esc(st.upiName) + '"></label></div>' +
+      '<label class="f"><span>Address (on invoices)</span><input class="i" name="address" value="' + esc(st.address) + '"></label>' +
+      '<div class="two"><label class="f"><span>UPI ID *</span><input class="i" name="upiId" placeholder="name@okaxis" value="' + esc(st.upiId) + '"></label><label class="f"><span>Name on UPI</span><input class="i" name="upiName" value="' + esc(st.upiName) + '"></label></div>' +
       '<div class="two"><label class="f"><span>Number prefix</span><input class="i" name="prefix" maxlength="6" value="' + esc(st.prefix) + '"></label><label class="f"><span>EMI round off (₹)</span><select class="i" name="emiRound">' + [1, 10, 50, 100].map(v => '<option' + (v === P(st.emiRound) ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></label></div>' +
       '<div class="two"><label class="f"><span>Combo discount (₹)</span><input class="i" name="comboDiscount" type="number" min="0" value="' + P(st.comboDiscount) + '"></label><label class="f"><span>Support renewal fee (₹)</span><input class="i" name="supportFee" type="number" min="0" value="' + P(st.supportFee) + '"></label></div>' +
       '<button class="btn gold block" type="submit">Save</button></form>';
     $('#bf').onsubmit = async e => {
       e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
       const upi = String(f.upiId).trim();
-      if (upi && !/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)) { toast('UPI ID sahi format mein daalo (name@bank)'); return; }
+      if (upi && !/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)) { toast('Enter the UPI ID in the right format (name@bank)'); return; }
       await saveSettings({ business: f.business.trim() || DEFAULT_SETTINGS.business, tagline: f.tagline.trim(), phone: digits(f.phone) ? waNumber(f.phone) : DEFAULT_SETTINGS.phone, email: f.email.trim(), address: f.address.trim(), upiId: upi, upiName: f.upiName.trim(), prefix: (f.prefix.trim() || 'ITW').toUpperCase(), emiRound: P(f.emiRound) || 1, comboDiscount: Math.max(0, P(f.comboDiscount)), supportFee: Math.max(0, P(f.supportFee)) });
-      toast('Save ho gaya'); location.hash = '#more';
+      toast('Saved'); location.hash = '#more';
     };
     return;
   }
   if (sub === 'prices') {
     setTitle('Packages & prices', true);
-    view().innerHTML = '<form class="card" id="prf"><p class="tiny" style="margin-top:0">Price badloge toh sirf naye orders pe lagega. Purane orders apne price pe rehte hain.</p>' + st.catalog.map((c, i) => '<div class="two" style="align-items:end"><label class="f"><span>' + esc(c.group) + '</span><input class="i" name="n' + i + '" value="' + esc(c.name) + '"></label><label class="f"><span>Price (₹)' + (c.group === 'custom' ? ' — 0 = har baar daalo' : '') + '</span><input class="i" type="number" min="0" name="p' + i + '" value="' + P(c.price) + '"></label></div>').join('') + '<button class="btn gold block" type="submit">Save</button></form>';
-    $('#prf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); const cat = st.catalog.map((c, i) => Object.assign({}, c, { name: String(f.get('n' + i)).trim() || c.name, price: Math.max(0, P(f.get('p' + i))) })); await saveSettings({ catalog: cat }); toast('Prices save ho gaye'); location.hash = '#more'; };
+    view().innerHTML = '<form class="card" id="prf"><p class="tiny" style="margin-top:0">Price changes apply to new orders only. Existing orders keep their prices.</p>' + st.catalog.map((c, i) => '<div class="two" style="align-items:end"><label class="f"><span>' + esc(c.group) + '</span><input class="i" name="n' + i + '" value="' + esc(c.name) + '"></label><label class="f"><span>Price (₹)' + (c.group === 'custom' ? ' — 0 = enter each time' : '') + '</span><input class="i" type="number" min="0" name="p' + i + '" value="' + P(c.price) + '"></label></div>').join('') + '<button class="btn gold block" type="submit">Save</button></form>';
+    $('#prf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); const cat = st.catalog.map((c, i) => Object.assign({}, c, { name: String(f.get('n' + i)).trim() || c.name, price: Math.max(0, P(f.get('p' + i))) })); await saveSettings({ catalog: cat }); toast('Prices saved'); location.hash = '#more'; };
     return;
   }
   if (sub === 'templates') {
     setTitle('WhatsApp messages', true);
     const labels = { reminder: 'EMI reminder', receipt: 'Payment receipt', invoice: 'Invoice', quote: 'Quotation', support: 'Support renewal', hello: 'General message' };
-    view().innerHTML = '<form class="card" id="tf"><p class="tiny" style="margin-top:0">{name}, {amount}, {dueText}, {orderNo}, {upi}, {business} jaise words apne aap bhar jaate hain. *text* = bold.</p>' + Object.keys(labels).map(k => '<label class="f"><span>' + labels[k] + '</span><textarea class="i" name="' + k + '" style="min-height:150px">' + esc(st.templates[k]) + '</textarea></label>').join('') + '<div class="btns grid2"><button class="btn" type="button" id="tReset">Default wapas</button><button class="btn gold" type="submit">Save</button></div></form>';
-    $('#tf').onsubmit = async e => { e.preventDefault(); await saveSettings({ templates: Object.fromEntries(new FormData(e.target)) }); toast('Messages save ho gaye'); location.hash = '#more'; };
-    $('#tReset').onclick = async () => { if (await confirmBox('Saare messages default pe wapas?', 'Haan')) { await saveSettings({ templates: {} }); renderMore('templates'); } };
+    view().innerHTML = '<form class="card" id="tf"><p class="tiny" style="margin-top:0">Words like {name}, {amount}, {dueText}, {orderNo}, {upi} and {business} are filled in automatically. *text* = bold.</p>' + Object.keys(labels).map(k => '<label class="f"><span>' + labels[k] + '</span><textarea class="i" name="' + k + '" style="min-height:150px">' + esc(st.templates[k]) + '</textarea></label>').join('') + '<div class="btns grid2"><button class="btn" type="button" id="tReset">Reset to default</button><button class="btn gold" type="submit">Save</button></div></form>';
+    $('#tf').onsubmit = async e => { e.preventDefault(); await saveSettings({ templates: Object.fromEntries(new FormData(e.target)) }); toast('Messages saved'); location.hash = '#more'; };
+    $('#tReset').onclick = async () => { if (await confirmBox('Reset all messages to default?', 'Yes')) { await saveSettings({ templates: {} }); renderMore('templates'); } };
     return;
   }
   if (sub === 'sync') {
     setTitle('Google Sheet sync', true);
-    view().innerHTML = '<div class="card"><h2>Status: <span id="ss">' + esc(S.url ? (S.sync.state === 'err' ? 'Error — ' + S.sync.msg : S.outbox.size ? S.outbox.size + ' changes upload baaki' : 'Connected') : 'Not connected (sirf is phone pe)') + '</span></h2>' + (S.lastSync ? '<p class="tiny">Last sync: ' + new Date(S.lastSync).toLocaleString('en-IN') + '</p>' : '') +
+    view().innerHTML = '<div class="card"><h2>Status: <span id="ss">' + esc(S.url ? (S.sync.state === 'err' ? 'Error — ' + S.sync.msg : S.outbox.size ? S.outbox.size + ' changes waiting to upload' : 'Connected') : 'Not connected (data on this device only)') + '</span></h2>' + (S.lastSync ? '<p class="tiny">Last sync: ' + new Date(S.lastSync).toLocaleString('en-IN') + '</p>' : '') +
       '<form id="sf"><label class="f"><span>Apps Script Web App URL</span><input class="i" name="url" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(S.url) + '"></label><label class="f"><span>Secret key</span><input class="i" name="key" type="password" value="' + esc(S.key) + '"></label>' +
       '<div class="btns grid2"><button class="btn" type="button" id="sTest">Test</button><button class="btn gold" type="submit">Save & sync</button></div>' + (S.url ? '<button class="btn red block" type="button" id="sOff" style="margin-top:8px">Disconnect</button>' : '') + '</form></div>' +
-      '<div class="card"><h2>Setup (ek baar, laptop pe aasaan)</h2><ol class="guide"><li>Google Sheets mein nayi blank sheet banao: <b>Izyan Tech Manager</b>. Kisi ke saath share mat karna.</li><li><b>Extensions → Apps Script</b> kholo, wahan ka code hata ke repo ki <code class="k">manager/apps-script/Code.gs</code> ka poora code paste karo, Save.</li><li>Function list mein <b>setupSheet</b> chuno → <b>Run</b> → permission Allow karo.</li><li>⚙️ Project Settings → Script properties → <b>SECRET_KEY</b> naam se 20+ character ka password daalo.</li><li><b>Deploy → New deployment → Web app</b>, Execute as <b>Me</b>, Who has access <b>Anyone</b> → Deploy, URL copy karo.</li><li>Yahan URL aur wahi secret key daal ke <b>Save & sync</b>. Doosre phone/laptop pe bhi yahi 2 cheezein daalo.</li></ol><p class="tiny">"Anyone" ka matlab ye nahi ki koi bhi data dekh sakta hai — har request mein secret key check hoti hai.</p></div>';
+      '<div class="card"><h2>Setup (one time, easiest on a laptop)</h2><ol class="guide"><li>Create a new blank Google Sheet named <b>Izyan Tech Manager</b>. Do not share it with anyone.</li><li>Open <b>Extensions → Apps Script</b>, delete the code there, paste the full code from <code class="k">manager/apps-script/Code.gs</code> and Save.</li><li>Pick <b>setupSheet</b> in the function list → <b>Run</b> → Allow the permissions.</li><li>⚙️ Project Settings → Script properties → add <b>SECRET_KEY</b> with a password of 20+ characters.</li><li><b>Deploy → New deployment → Web app</b>, Execute as <b>Me</b>, Who has access <b>Anyone</b> → Deploy, then copy the URL.</li><li>Paste the URL and the same secret key here and tap <b>Save & sync</b>. Enter the same two values on your other phone or laptop.</li></ol><p class="tiny">"Anyone" does not mean anyone can see your data — every request is checked against the secret key.</p></div>';
     const read = () => { const f = new FormData($('#sf')); return { url: String(f.get('url')).trim(), key: String(f.get('key')).trim() }; };
-    $('#sTest').onclick = async () => { const { url, key } = read(); if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('URL https://script.google.com/macros/s/…/exec jaisa hona chahiye', 4000); return; } try { await api('ping', {}, url, key); toast('✅ Sheet connected'); } catch (e) { toast('❌ ' + e.message, 5000); } };
+    $('#sTest').onclick = async () => { const { url, key } = read(); if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('The URL should look like https://script.google.com/macros/s/…/exec', 4000); return; } try { await api('ping', {}, url, key); toast('✅ Sheet connected'); } catch (e) { toast('❌ ' + e.message, 5000); } };
     $('#sf').onsubmit = async e => {
       e.preventDefault(); const { url, key } = read();
-      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('URL https://script.google.com/macros/s/…/exec jaisa hona chahiye', 4000); return; }
-      if (key.length < 8) { toast('Secret key daalo'); return; }
+      if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) { toast('The URL should look like https://script.google.com/macros/s/…/exec', 4000); return; }
+      if (key.length < 8) { toast('Enter the secret key'); return; }
       try { await api('ping', {}, url, key); } catch (err) { toast('❌ ' + err.message, 5000); return; }
       const fresh = S.url !== url; S.url = url; S.key = key; await saveMeta('conn', { url, key });
       if (fresh) { S.cursor = 0; await saveMeta('cursor', 0); TABLES.forEach(t => S.t[t].forEach(r => S.outbox.add(t + '|' + r.id))); await saveOutbox(); }
-      toast('Sync shuru…'); await syncNow(); toast(S.sync.state === 'err' ? '❌ ' + S.sync.msg : '✅ Sync ho gaya', 4000); renderMore('sync');
+      toast('Syncing…'); await syncNow(); toast(S.sync.state === 'err' ? '❌ ' + S.sync.msg : '✅ Synced', 4000); renderMore('sync');
     };
-    if ($('#sOff')) $('#sOff').onclick = async () => { if (await confirmBox('Sheet se disconnect karna hai? Data is phone pe rahega.', 'Disconnect', true)) { S.url = ''; S.key = ''; S.sync = { state: 'off', msg: '' }; await saveMeta('conn', { url: '', key: '' }); updateChip(); renderMore('sync'); } };
+    if ($('#sOff')) $('#sOff').onclick = async () => { if (await confirmBox('Disconnect from the Sheet? Your data stays on this device.', 'Disconnect', true)) { S.url = ''; S.key = ''; S.sync = { state: 'off', msg: '' }; await saveMeta('conn', { url: '', key: '' }); updateChip(); renderMore('sync'); } };
     return;
   }
   setTitle('More', false);
   const counts = TABLES.slice(0, 4).map(t => t + ': ' + live(t).length).join(' • ');
-  view().innerHTML = '<div class="card list"><a class="row" href="#payments"><div class="main"><b>📒 Payments</b><small>Mahine ke hisaab se collection, CSV</small></div></a>' +
-    '<a class="row" href="#more/business"><div class="main"><b>🏢 Business details & UPI</b><small>' + esc(st.business) + (st.upiId ? ' • ' + esc(st.upiId) : ' • UPI ID baaki') + '</small></div></a>' +
+  view().innerHTML = '<div class="card list"><a class="row" href="#payments"><div class="main"><b>📒 Payments</b><small>Monthly collection, CSV export</small></div></a>' +
+    '<a class="row" href="#more/business"><div class="main"><b>🏢 Business details & UPI</b><small>' + esc(st.business) + (st.upiId ? ' • ' + esc(st.upiId) : ' • UPI ID not set') + '</small></div></a>' +
     '<a class="row" href="#more/prices"><div class="main"><b>🏷️ Packages & prices</b><small>Digital Shop, Billing, add-ons</small></div></a>' +
     '<a class="row" href="#more/templates"><div class="main"><b>💬 WhatsApp messages</b><small>Reminder, receipt, invoice, quotation</small></div></a>' +
     '<a class="row" href="#more/sync"><div class="main"><b>☁️ Google Sheet sync</b><small>' + (S.url ? 'Connected' : 'Not connected') + '</small></div></a></div>' +
     '<div class="card"><h2>Backup</h2><p class="tiny" style="margin-top:0">' + counts + '</p><div class="btns grid2"><button class="btn" id="bExp">⬇️ Backup file</button><button class="btn" id="bImp">⬆️ Restore</button></div></div>' +
-    '<div class="card"><h2>Security</h2><div class="btns grid2"><button class="btn" id="lockNow">🔒 Lock now</button><button class="btn" id="chPin">🔑 PIN badlo</button></div></div>' +
+    '<div class="card"><h2>Security</h2><div class="btns grid2"><button class="btn" id="lockNow">🔒 Lock now</button><button class="btn" id="chPin">🔑 Change PIN</button></div></div>' +
     '<p class="tiny" style="text-align:center">Izyan Tech Manager • ' + esc(S.me ? S.me.name : '') + '</p>';
   $('#lockNow').onclick = () => showLock();
-  $('#chPin').onclick = () => sheet('PIN badlo', '<form id="pinf"><label class="f"><span>Purana PIN</span><input class="i" name="old" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>Naya PIN (4 ya 6 digit)</span><input class="i" name="n1" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>Naya PIN dobara</span><input class="i" name="n2" type="password" inputmode="numeric" maxlength="6" required></label><button class="btn gold block">Save</button></form>', (el, close) => {
-    $('#pinf', el).onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); if (await hashPin(String(f.get('old')), S.me.salt) !== S.me.pinHash) { toast('Purana PIN galat hai'); return; } const n1 = String(f.get('n1')); if (!/^(\d{4}|\d{6})$/.test(n1) || n1 !== String(f.get('n2'))) { toast('Naya PIN 4/6 digit ka aur dono same hone chahiye'); return; } const salt = uid(); S.me = Object.assign({}, S.me, { salt, pinHash: await hashPin(n1, salt), pinLen: n1.length }); await saveMeta('profile', S.me); close(); toast('PIN badal gaya'); };
+  $('#chPin').onclick = () => sheet('Change PIN', '<form id="pinf"><label class="f"><span>Current PIN</span><input class="i" name="old" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>New PIN (4 or 6 digits)</span><input class="i" name="n1" type="password" inputmode="numeric" maxlength="6" required></label><label class="f"><span>Confirm new PIN</span><input class="i" name="n2" type="password" inputmode="numeric" maxlength="6" required></label><button class="btn gold block">Save</button></form>', (el, close) => {
+    $('#pinf', el).onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target); if (await hashPin(String(f.get('old')), S.me.salt) !== S.me.pinHash) { toast('Current PIN is wrong'); return; } const n1 = String(f.get('n1')); if (!/^(\d{4}|\d{6})$/.test(n1) || n1 !== String(f.get('n2'))) { toast('New PIN must be 4 or 6 digits and both must match'); return; } const salt = uid(); S.me = Object.assign({}, S.me, { salt, pinHash: await hashPin(n1, salt), pinLen: n1.length }); await saveMeta('profile', S.me); close(); toast('PIN changed'); };
   });
   $('#bExp').onclick = () => {
     const data = { app: 'izyan-tech-manager', version: 1, exportedAt: nowISO(), tables: Object.fromEntries(TABLES.map(t => [t, [...S.t[t].values()]])) };
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'izyan-tech-manager-backup-' + today() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-    toast('Backup file download ho gayi');
+    toast('Backup file downloaded');
   };
   $('#bImp').onclick = () => $('#importFile').click();
 }
 $('#importFile').onchange = async e => {
   const file = e.target.files[0]; e.target.value = ''; if (!file) return;
-  let data; try { data = JSON.parse(await file.text()); } catch (err) { toast('Ye backup file sahi nahi hai'); return; }
-  if (!data || data.app !== 'izyan-tech-manager' || !data.tables) { toast('Ye Izyan Tech Manager ki backup file nahi hai'); return; }
-  if (!(await confirmBox('Backup restore karna hai? Jo record backup mein naye hain wahi lagenge, baaki data safe rahega.', 'Restore'))) return;
+  let data; try { data = JSON.parse(await file.text()); } catch (err) { toast('This backup file is not valid'); return; }
+  if (!data || data.app !== 'izyan-tech-manager' || !data.tables) { toast('This is not an Izyan Tech Manager backup file'); return; }
+  if (!(await confirmBox('Restore this backup? Only records that are newer in the backup are applied; everything else stays as it is.', 'Restore'))) return;
   const writes = []; let n = 0;
   TABLES.forEach(t => (data.tables[t] || []).forEach(r => { if (!r || !r.id) return; const cur = S.t[t].get(r.id); if (!cur || isNewer(r, cur)) { S.t[t].set(r.id, r); writes.push([t, r]); S.outbox.add(t + '|' + r.id); n++; } }));
-  await putRecs(writes); await saveOutbox(); scheduleSync(); toast(n + ' records restore hue'); render();
+  await putRecs(writes); await saveOutbox(); scheduleSync(); toast(n + ' records restored'); render();
 };
 
 /* ------------------------------------------------------------ actions (event delegation) */
@@ -1213,8 +1213,8 @@ document.addEventListener('click', async e => {
   }
   if (act === 'delOrder') {
     const o = get('Orders', id); if (!o) return;
-    if (orderPayments(o).length) { toast('Is order pe payments hain — pehle unhe delete karo'); return; }
-    if (await confirmBox('Order ' + o.orderNo + ' hamesha ke liye delete karna hai?', 'Delete', true)) { await remove('Orders', o); live('Invoices').filter(i => i.orderId === o.id).forEach(i => remove('Invoices', i)); toast('Order delete ho gaya'); location.hash = '#orders'; }
+    if (orderPayments(o).length) { toast('This order has payments — delete them first'); return; }
+    if (await confirmBox('Delete order ' + o.orderNo + ' permanently?', 'Delete', true)) { await remove('Orders', o); live('Invoices').filter(i => i.orderId === o.id).forEach(i => remove('Invoices', i)); toast('Order deleted'); location.hash = '#orders'; }
   }
 });
 $$('.nav a').forEach(a => a.addEventListener('click', () => { if (a.dataset.nav === 'new') draft = null; }));
@@ -1223,7 +1223,7 @@ window.addEventListener('online', () => scheduleSync(300));
 /* ------------------------------------------------------------ start */
 (async function start() {
   try { await loadAll(); }
-  catch (e) { document.body.innerHTML = '<p style="padding:24px">Storage nahi khul paaya: ' + esc(e.message) + '. Private/incognito mode band karke kholo.</p>'; return; }
+  catch (e) { document.body.innerHTML = '<p style="padding:24px">Could not open storage: ' + esc(e.message) + '. Please open the app outside private/incognito mode.</p>'; return; }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   if (S.url) S.sync.state = 'ok';
   updateChip();
