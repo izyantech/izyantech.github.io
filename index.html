@@ -48,11 +48,39 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
 .whatsapp-float{position:fixed;right:18px;bottom:18px;z-index:15;background:var(--green);color:#062515;border-radius:99px;padding:13px 17px;font-size:12px;font-weight:900;box-shadow:0 10px 35px #0008}
 /* demo modal */
 .modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);padding:20px}.modal.open{display:flex;align-items:center;justify-content:center}.modal-box{width:min(960px,100%);max-height:88vh;overflow:auto;background:#08182b;border:1px solid var(--line);border-radius:20px;padding:28px;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.6)}.modal-close{position:absolute;right:14px;top:14px;border:0;background:#1a2c44;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}.modal-box h2{font-size:26px;padding-right:44px;margin-bottom:4px}.modal-box .sub{color:var(--muted);margin:0 0 20px;font-size:14px}.demo-items{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.demo-item{background:#102742;border:1px solid var(--line);border-radius:14px;padding:14px}.demo-item .art{height:96px;border-radius:10px;margin-bottom:10px;display:grid;place-items:center;font-size:32px}.demo-item b{display:block;font-size:14px}.demo-item small{display:block;color:var(--gold2);margin:4px 0 12px;font-weight:800}.demo-order{background:var(--green);color:#062214;border:0;border-radius:9px;padding:9px 12px;font-weight:800;cursor:pointer;width:100%;font-size:12px}
+/* billing & inventory tab */
+.nav-new{position:relative}.nav-new:after{content:"NEW";position:absolute;top:-6px;right:-4px;font-size:8px;font-weight:900;letter-spacing:.5px;background:var(--green);color:#062515;padding:2px 5px;border-radius:5px}
+.card-new{border-color:rgba(37,211,102,.45);background:radial-gradient(circle at 85% 0,rgba(37,211,102,.14),transparent 50%),linear-gradient(145deg,#10243bdb,#0a1a2d)}.badge-new{background:var(--green);color:#062515}
+.grad-text{background:linear-gradient(100deg,#f1d27a 0%,#ffe9b0 35%,#25d366 70%,#7ee6ac 100%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 6s linear infinite}@keyframes shine{to{background-position:200% center}}
+.bill-hero{padding:70px 0 40px;position:relative;overflow:hidden}.bill-hero:before{content:"";position:absolute;width:520px;height:520px;right:-120px;top:-160px;border-radius:50%;background:radial-gradient(circle,rgba(37,211,102,.16),transparent 65%);pointer-events:none}.bill-hero:after{content:"";position:absolute;width:420px;height:420px;left:-160px;bottom:-200px;border-radius:50%;background:radial-gradient(circle,rgba(215,168,61,.14),transparent 65%);pointer-events:none}
+.bill-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;position:relative;z-index:1}.bill-copy h1{font-size:clamp(40px,5.2vw,64px)}.bill-copy>p{color:#c4d0df;max-width:560px;font-size:16px}
+.proof{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.proof span{display:inline-flex;align-items:center;gap:8px;font-size:12px;padding:8px 12px;border-radius:99px;border:1px solid rgba(37,211,102,.35);background:rgba(37,211,102,.08);color:#bdeccf}.proof span:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.app-stage{position:relative;min-height:470px;display:grid;place-items:center}.app-ring{position:absolute;width:360px;height:360px;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(37,211,102,.35),transparent 30%,rgba(215,168,61,.35),transparent 60%);filter:blur(28px);animation:spin 14s linear infinite;opacity:.8}@keyframes spin{to{transform:rotate(360deg)}}
+.app-phone{position:relative;z-index:2;width:250px;padding:10px;border-radius:32px;background:#020a13;border:2px solid #5c6e86;box-shadow:0 30px 80px #000a}.app-screen{border-radius:24px;background:#0b1a2c;padding:14px;min-height:430px}.app-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#9fb0c5;margin-bottom:10px}.app-top b{color:#fff;font-size:13px}.app-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));display:grid;place-items:center;color:#1a1a15;font-weight:900;font-size:11px}
+.app-hero-tile{border-radius:14px;padding:12px;background:linear-gradient(135deg,#123f2c,#0f2a3f);border:1px solid rgba(37,211,102,.35);margin-bottom:8px}.app-hero-tile small{display:block;font-size:9px;letter-spacing:.08em;color:#9fe8bd}.app-hero-tile strong{font-size:24px;letter-spacing:-.5px}.app-hero-tile em{font-style:normal;font-size:10px;color:#7ee6ac;margin-left:6px}
+.app-tiles{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}.app-tile{background:#10243a;border:1px solid var(--line);border-radius:11px;padding:9px}.app-tile small{display:block;font-size:8.5px;color:#9fb0c5}.app-tile b{font-size:14px}.app-tile.warn b{color:#ffb86b}.app-tile.due b{color:var(--gold2)}
+.app-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}.app-btns span{border-radius:10px;padding:9px 6px;text-align:center;font-size:10px;font-weight:800}.app-btns span:first-child{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1a15}.app-btns span:last-child{background:#10243a;border:1px solid var(--line)}
+.app-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:7px 2px;border-top:1px solid var(--line)}.app-row span{color:#c4d0df}.app-row b{font-size:10.5px}.app-row i{font-style:normal;font-size:8.5px;padding:2px 6px;border-radius:5px;margin-left:5px}.paid{background:rgba(37,211,102,.16);color:#7ee6ac}.pend{background:rgba(255,184,107,.16);color:#ffb86b}
+.float-card{position:absolute;z-index:3;border-radius:14px;box-shadow:0 18px 45px #0009;animation:floaty 5s ease-in-out infinite}.float-bill{left:-6px;top:56px;width:170px;background:#fff;color:#14243a;padding:12px;transform:rotate(-6deg)}.float-bill .fb-head{display:flex;justify-content:space-between;font-size:9px;color:#5a6b80;margin-bottom:6px}.float-bill b{display:block;font-size:12px}.float-bill .fb-line{height:6px;border-radius:4px;background:#e7ecf2;margin:5px 0}.float-bill .fb-line.s{width:60%}.float-bill .fb-total{display:flex;justify-content:space-between;font-size:11px;font-weight:900;margin-top:8px;border-top:1px dashed #cbd5e1;padding-top:6px}.float-bill .fb-wa{margin-top:8px;background:var(--green);color:#062515;border-radius:8px;font-size:9.5px;font-weight:900;padding:6px;text-align:center}
+.float-stock{right:-14px;top:150px;background:#2a1a0c;border:1px solid #8a5a22;color:#ffd9a8;padding:10px 12px;font-size:11px;animation-delay:-2s;transform:rotate(4deg)}.float-stock b{display:block;color:#ffb86b;font-size:10px;letter-spacing:.06em}
+.float-sync{right:0;bottom:46px;background:#0c2a1c;border:1px solid #1f7650;color:#bdeccf;padding:10px 12px;font-size:11px;animation-delay:-3.5s}.float-sync b{color:#7ee6ac}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -10px}}
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.feat{position:relative;border-radius:18px;padding:20px;background:linear-gradient(160deg,#10243b,#0a1a2d);border:1px solid var(--line);overflow:hidden;transition:.25s}.feat:hover{transform:translateY(-4px);border-color:rgba(37,211,102,.45)}.feat:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--gold2),var(--green));opacity:0;transition:.25s}.feat:hover:before{opacity:1}.feat .fi{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:21px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);margin-bottom:12px}.feat h3{font-size:15px;margin-bottom:5px}.feat p{font-size:12.5px;color:var(--muted);margin:0}
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.case{position:relative;border-radius:24px;padding:2px;background:linear-gradient(140deg,var(--c1),transparent 40%,transparent 60%,var(--c2))}.case-in{border-radius:22px;padding:26px;height:100%;background:linear-gradient(160deg,#0f2239,#08182a);display:flex;flex-direction:column}
+.case.khalifa{--c1:#d7a83d;--c2:#7a5418;--acc:#f1d27a}.case.sweet{--c1:#f39bb8;--c2:#d7a83d;--acc:#f7b3c9}
+.case-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}.case-logo{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex-shrink:0;background:linear-gradient(135deg,var(--c1),var(--c2))}.case-head h3{margin:0 0 4px;font-size:20px}.case-head small{color:var(--muted);font-size:12px}.live{margin-left:auto;align-self:flex-start;font-size:9.5px;font-weight:900;letter-spacing:.06em;color:#a5f4bd;background:#123d2b;border:1px solid #1f7650;padding:5px 9px;border-radius:99px;white-space:nowrap}
+.case-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 18px}.case-strip div{border-radius:12px;padding:11px;background:#0b1d31;border:1px solid var(--line)}.case-strip b{display:block;font-size:13px;color:var(--acc)}.case-strip small{font-size:10.5px;color:var(--muted)}
+.case-list{list-style:none;padding:0;margin:0 0 18px;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;flex:1}.case-list li{font-size:13px;color:#d3deeb;display:flex;gap:8px;line-height:1.4}.case-list li:before{content:"✓";color:var(--acc);font-weight:900}
+.case-quote{font-size:12.5px;color:#c4d0df;border-left:3px solid var(--acc);padding:4px 0 4px 12px;margin:0 0 18px}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch}.vs-col{border-radius:20px;padding:24px}.vs-col h3{font-size:18px;margin-bottom:12px}.vs-col ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}.vs-col li{font-size:13.5px;display:flex;gap:10px}.vs-old{background:rgba(255,90,90,.06);border:1px solid rgba(255,90,90,.25)}.vs-old li{color:#f0c4c4}.vs-old li:before{content:"✕";color:#ff8a8a;font-weight:900}.vs-new{background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.35)}.vs-new li{color:#d4f5e1}.vs-new li:before{content:"✓";color:var(--green);font-weight:900}.vs-mid{display:grid;place-items:center;font-weight:900;color:var(--gold2);font-size:22px}
+.bill-cta{text-align:center;border-radius:26px;padding:46px 24px;border:1px solid rgba(37,211,102,.35);background:radial-gradient(circle at 50% 0,rgba(37,211,102,.16),transparent 55%),linear-gradient(145deg,#102742,#091727)}.bill-cta h2{margin-bottom:10px}.bill-cta p{color:var(--muted);max-width:620px;margin:0 auto 22px}.bill-cta .actions{justify-content:center;margin:0}
+@media(prefers-reduced-motion:reduce){.grad-text,.app-ring,.float-card{animation:none}}
 @media(max-width:850px){
  .navlinks{display:none}.nav{height:64px}html{scroll-padding-top:78px}.nav-inner>.btn{padding:9px 13px;font-size:12px}
- .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:25;background:#061323f5;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+ .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:25;background:#061323f5;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:10px;font-size:10px;font-weight:700;color:#9fb0c5}.tabbar svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.tabbar a.active{color:var(--gold2);background:#10243a}
- body{padding-bottom:72px}.whatsapp-float{bottom:86px;right:14px}
+ body{padding-bottom:72px}.whatsapp-float{bottom:86px;right:14px}.tabbar a{font-size:9.5px}
+ .bill-grid,.case-grid{grid-template-columns:1fr}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
  .hero-grid,.split,.contact-grid{grid-template-columns:1fr}.hero{padding-top:52px}.visual{min-height:390px;margin:0 0 15px;order:1}.dash{right:0}.service-grid,.sample-grid,.reel-grid,.steps{grid-template-columns:repeat(2,1fr)}.section{padding:60px 0}.page-hero{padding:46px 0 0}.hero-grid{gap:12px}.mock-window{max-width:600px;margin:auto;width:100%}.demo-items{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:520px){
@@ -60,6 +88,8 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  .visual{min-height:350px;transform:scale(.94);transform-origin:top center;margin-bottom:-5px}.phone{width:190px}.screen{min-height:280px}.dash{width:185px;right:-4px;top:20px;padding:12px}.reel-card{width:112px;height:150px;right:0;bottom:6px}.floating-label{left:-4px;bottom:22px;font-size:9px}
  .service-grid,.automation-grid,.reel-grid,.faq-grid,.plan-grid,.ba{grid-template-columns:1fr}.card{padding:19px}.sample-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sample-art{height:90px;font-size:32px}.sample-body{padding:11px}.sample-body h3{font-size:12px}.sample-body p{display:none}
  .steps{grid-template-columns:1fr 1fr;gap:9px}.step{padding:13px}.step p{font-size:11px}.section{padding:50px 0}.dark-panel{padding:21px}.mock-products{grid-template-columns:repeat(2,1fr)}.mock-item:last-child{display:none}.plan-price{font-size:31px}.footer-row{align-items:flex-start;flex-direction:column}.reel{min-height:220px}.flow{gap:6px}.flow span{font-size:11px}.contact-grid{gap:16px}
+ .bill-copy h1{font-size:38px}.app-stage{min-height:450px}.app-ring{width:280px;height:280px}.app-phone{width:220px}.app-screen{min-height:400px;padding:12px}.float-bill{width:122px;left:-14px;top:14px;padding:9px}.float-bill b{font-size:10.5px}.float-bill .fb-wa{font-size:8.5px}.float-stock{right:-10px;top:150px;font-size:10px}.float-sync{right:-8px;bottom:-4px;font-size:10px}
+ .feat-grid{gap:10px}.feat{padding:15px}.feat .fi{width:38px;height:38px;font-size:18px}.feat h3{font-size:13.5px}.feat p{font-size:11.5px}.case-in{padding:20px}.case-list{grid-template-columns:1fr}.case-strip{gap:6px}.case-strip div{padding:9px}.case-strip b{font-size:12px}.case-head h3{font-size:17px}.case-logo{width:46px;height:46px;font-size:22px}.bill-cta{padding:34px 18px}
  .whatsapp-float{padding:12px 14px}.modal{padding:10px}.modal-box{padding:20px 16px}.demo-items{grid-template-columns:1fr 1fr;gap:9px}.demo-item{padding:10px}.demo-item .art{height:72px;font-size:26px}.demo-item b{font-size:12px}
 }
 </style>
@@ -71,6 +101,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
   <nav class="navlinks" aria-label="Main">
    <a href="#home" data-tab="home">Home</a>
    <a href="#digital-shop" data-tab="digital-shop">Digital Shop</a>
+   <a href="#billing" data-tab="billing" class="nav-new">Billing &amp; Inventory</a>
    <a href="#reels" data-tab="reels">Reels &amp; Videos</a>
    <a href="#automation" data-tab="automation">Automation &amp; Tools</a>
    <a href="#contact" data-tab="contact">Contact</a>
@@ -85,9 +116,9 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  <section class="hero"><div class="wrap hero-grid">
   <div class="hero-copy"><span class="eyebrow">Tech partner for local &amp; growing businesses</span>
    <h1>Your Business.<br><span class="gold">Digital, Automated<br>&amp; Growing.</span></h1>
-   <p>We handle the tech side of your business — a QR digital shop, a website, Excel sheets that do the work for you, and reels that bring new customers in.</p>
+   <p>We handle the tech side of your business — a QR digital shop, a billing &amp; stock app, a website, Excel sheets that do the work for you, and reels that bring new customers in.</p>
    <div class="actions"><a class="btn btn-gold" href="#services">Explore Our Services →</a><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know how you can help my business.">◉ Talk on WhatsApp</a></div>
-   <div class="stats"><div class="stat"><strong>5</strong><span>Services</span></div><div class="stat"><strong>2+</strong><span>Shops Live</span></div><div class="stat"><strong>1</strong><span>WhatsApp for everything</span></div></div>
+   <div class="stats"><div class="stat"><strong>6</strong><span>Services</span></div><div class="stat"><strong>2+</strong><span>Shops Live</span></div><div class="stat"><strong>1</strong><span>WhatsApp for everything</span></div></div>
   </div>
   <div class="visual" aria-label="Digital shop, dashboard and reel preview"><div class="glow"></div>
    <div class="phone"><div class="screen"><div class="screen-top">IZYAN <b>TECH WORLD</b><br><small>Digital Shop Preview</small></div><div class="shop-banner">Your Shop.<br>One Scan Away.</div><div class="mini-products"><div class="mini-product">🧴<small>Attars</small></div><div class="mini-product">🎁<small>Gifts</small></div><div class="mini-product">🧁<small>Bakery</small></div><div class="mini-product">👗<small>Boutique</small></div></div></div></div>
@@ -103,8 +134,10 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
    <article class="card"><div class="card-icon">▤</div><h3>Excel Automation &amp; Dashboards</h3><p>Smart spreadsheets, reporting dashboards, data cleanup and repetitive-task automation.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#automation">Explore Automation →</a></article>
    <article class="card"><div class="card-icon">▶</div><h3>Reels &amp; Digital Marketing</h3><p>Product reels, promotional videos and social media creatives that make your business stand out.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#reels">Explore Reels →</a></article>
    <article class="card"><div class="card-icon">⌘</div><h3>Custom Tools &amp; WhatsApp Automation</h3><p>Purpose-built tools, enquiry flows and simple automations that reduce manual work.</p><div class="price">Custom quote</div><a class="btn btn-ghost" href="#automation-tools">Explore Tools →</a></article>
-   <article class="card"><div class="card-icon">✦</div><h3>Have something else in mind?</h3><p>Tell us the problem you want to solve. We’ll suggest a practical digital solution for your business.</p><div class="price">Let’s plan it together</div><a class="btn btn-gold" href="#contact" data-service="Other / Custom idea">Share Your Idea →</a></article>
-  </div></div></section>
+   <article class="card card-new"><span class="badge badge-new">NEW</span><div class="card-icon">🧾</div><h3>Billing &amp; Inventory Apps</h3><p>Your own shop app for bills on WhatsApp, stock, orders, udhaar and daily reports — works on every phone.</p><div class="price">Custom quote</div><a class="btn btn-gold" href="#billing">Explore Billing Apps →</a></article>
+  </div>
+  <div class="dark-panel next-cta" style="margin-top:16px"><div><h3 style="margin-bottom:6px">✦ Have something else in mind?</h3><p class="muted" style="margin:0;font-size:13px">Tell us the problem you want to solve. We’ll suggest a practical digital solution for your business.</p></div><a class="btn btn-gold" href="#contact" data-service="Other / Custom idea">Share Your Idea →</a></div>
+ </div></section>
 
  <section class="section" id="how"><div class="wrap"><div class="section-head"><span class="eyebrow">Simple, transparent process</span><h2>From First Conversation <span class="gold">to Launch.</span></h2><p>Clear steps, agreed scope and practical communication throughout the project.</p></div>
   <div class="steps"><div class="step"><div class="step-num">1</div><h3>Discuss</h3><p>Tell us your business, goals and requirements.</p></div><div class="step"><div class="step-num">2</div><h3>Plan &amp; Quote</h3><p>We confirm the deliverables, timeline and price.</p></div><div class="step"><div class="step-num">3</div><h3>Design &amp; Build</h3><p>We create the solution around your needs.</p></div><div class="step"><div class="step-num">4</div><h3>Review &amp; Launch</h3><p>You check the work, share feedback and we go live.</p></div></div>
@@ -148,6 +181,83 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  </div></section>
 </div>
 
+<!-- ================= BILLING & INVENTORY ================= -->
+<div class="page" id="billing" data-title="Billing & Inventory Apps">
+ <section class="bill-hero"><div class="wrap bill-grid">
+  <div class="bill-copy"><span class="eyebrow">New • Billing &amp; Inventory Apps</span>
+   <h1>Run Your Whole Shop<br><span class="grad-text">From Your Phone.</span></h1>
+   <p>Bills on WhatsApp, stock that updates itself, orders, udhaar and daily profit — in one app built around how <b>your</b> shop works. No registers, no complicated software to learn.</p>
+   <div class="actions"><a class="btn btn-gold" href="#case-studies">See Live Client Apps →</a><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I want a billing & inventory app for my shop. Can you show me a demo?">◉ Book a Live Demo</a></div>
+   <div class="proof"><span>Live at 2 businesses</span><span>Works offline</span><span>Bills sent on WhatsApp</span></div>
+  </div>
+  <div class="app-stage" aria-label="Sample billing app screen">
+   <div class="app-ring"></div>
+   <div class="app-phone"><div class="app-screen">
+    <div class="app-top"><div><small>Good evening 👋</small><br><b>Business Manager</b></div><div class="app-avatar">YS</div></div>
+    <div class="app-hero-tile"><small>TODAY’S SALES</small><strong>₹12,480</strong><em>▲ 18 bills</em></div>
+    <div class="app-tiles"><div class="app-tile"><small>Pending orders</small><b>4</b></div><div class="app-tile due"><small>Udhaar to collect</small><b>₹3,250</b></div><div class="app-tile warn"><small>Low stock</small><b>3 items</b></div><div class="app-tile"><small>Cash &amp; bank</small><b>₹28,900</b></div></div>
+    <div class="app-btns"><span>⚡ Quick Bill</span><span>＋ New Order</span></div>
+    <div class="app-row"><span>Bill #0128 · Ayesha</span><b>₹1,450<i class="paid">PAID</i></b></div>
+    <div class="app-row"><span>Bill #0127 · Rahul</span><b>₹860<i class="pend">DUE</i></b></div>
+    <div class="app-row"><span>Bill #0126 · Walk-in</span><b>₹320<i class="paid">PAID</i></b></div>
+   </div></div>
+   <div class="float-card float-bill"><div class="fb-head"><span>INVOICE</span><span>#0128</span></div><b>Your Shop Name</b><div class="fb-line"></div><div class="fb-line s"></div><div class="fb-line"></div><div class="fb-total"><span>Total</span><span>₹1,450</span></div><div class="fb-wa">✓ PDF sent on WhatsApp</div></div>
+   <div class="float-card float-stock"><b>⚠ LOW STOCK</b>3 items need re-order</div>
+   <div class="float-card float-sync"><b>●</b> All phones in sync</div>
+  </div>
+ </div></section>
+
+ <section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Everything in one app</span><h2>Built for the counter, <span class="gold">not for accountants.</span></h2><p>Big buttons, simple screens and only the features your shop actually needs. Sample screens above use demo data.</p></div>
+  <div class="feat-grid">
+   <div class="feat"><div class="fi">🧾</div><h3>Fast Billing</h3><p>Tap products, add the customer, save — bill ready in seconds.</p></div>
+   <div class="feat"><div class="fi">💬</div><h3>Bills on WhatsApp</h3><p>Send a clean PDF bill straight to the customer’s WhatsApp.</p></div>
+   <div class="feat"><div class="fi">📦</div><h3>Stock &amp; Low-Stock Alerts</h3><p>Stock reduces with every sale and warns you before you run out.</p></div>
+   <div class="feat"><div class="fi">📒</div><h3>Udhaar &amp; Dues</h3><p>See who owes what and collect pending payments on time.</p></div>
+   <div class="feat"><div class="fi">🗓️</div><h3>Orders &amp; Advances</h3><p>Pre-orders with advance paid, due dates and balance tracking.</p></div>
+   <div class="feat"><div class="fi">📊</div><h3>Reports &amp; Profit</h3><p>Daily sales, expenses, stock value and monthly profit at a glance.</p></div>
+   <div class="feat"><div class="fi">📱</div><h3>Multi-Phone &amp; Offline</h3><p>Install like an app, keep working without internet, sync later.</p></div>
+   <div class="feat"><div class="fi">🔒</div><h3>Your Data Stays Yours</h3><p>PIN lock, backups and your own Google Sheet — not someone else’s server.</p></div>
+  </div>
+ </div></section>
+
+ <section class="section" id="case-studies"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Live at our clients</span><h2>Real Shops. <span class="gold">Real Apps.</span></h2><p>Two businesses already run their daily billing and stock on apps we built for them.</p></div>
+  <div class="case-grid">
+   <article class="case khalifa"><div class="case-in">
+    <div class="case-head"><div class="case-logo">🧴</div><div><h3>Khalifa Business Manager</h3><small>Khalifa Attar &amp; Perfumes</small></div><span class="live">● LIVE IN USE</span></div>
+    <div class="case-strip"><div><b>3 phones</b><small>always in sync</small></div><div><b>PDF bills</b><small>on WhatsApp</small></div><div><b>Offline</b><small>works without net</small></div></div>
+    <p class="case-quote">A counter billing app for an attar shop — every staff phone bills on its own and everything lands in one Google Sheet.</p>
+    <ul class="case-list"><li>POS-style quick billing</li><li>Customers &amp; dues (udhaar)</li><li>Bill PDF + caption on WhatsApp</li><li>Cash &amp; bank tracking</li><li>Sales &amp; daily reports</li><li>Separate bill series per staff</li><li>PIN lock for every user</li><li>Audit log of every change</li></ul>
+    <a class="btn btn-gold" href="#contact" data-service="Billing &amp; Inventory App">Get an App Like This →</a>
+   </div></article>
+   <article class="case sweet"><div class="case-in">
+    <div class="case-head"><div class="case-logo">🍫</div><div><h3>Sweetness Manager</h3><small>Sweetness — Homemade Chocolates</small></div><span class="live">● LIVE IN USE</span></div>
+    <div class="case-strip"><div><b>Orders</b><small>advance &amp; due date</small></div><div><b>Stock</b><small>low-stock alerts</small></div><div><b>Profit</b><small>monthly view</small></div></div>
+    <p class="case-quote">A home-business manager for a chocolate brand — made-to-order boxes, stock, suppliers and repeat customers in one place.</p>
+    <ul class="case-list"><li>Quick bill + made-to-order</li><li>Bills on WhatsApp</li><li>Stock, purchases &amp; suppliers</li><li>Expenses &amp; monthly profit</li><li>Coupons, loyalty &amp; GST</li><li>WhatsApp campaigns &amp; follow-ups</li><li>Win back customers who stopped ordering</li><li>Backup &amp; restore</li></ul>
+    <a class="btn btn-gold" href="#contact" data-service="Billing &amp; Inventory App">Get an App Like This →</a>
+   </div></article>
+  </div>
+ </div></section>
+
+ <section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">The difference</span><h2>From Register Book <span class="gold">to Smart App.</span></h2></div>
+  <div class="vs">
+   <div class="vs-col vs-old"><h3>📕 Without an app</h3><ul><li>Bills written by hand, numbers added on a calculator</li><li>Stock checked only when something runs out</li><li>Udhaar spread across notebooks and memory</li><li>No idea of real profit until month-end</li></ul></div>
+   <div class="vs-mid">→</div>
+   <div class="vs-col vs-new"><h3>📱 With your own app</h3><ul><li>Bill made and sent on WhatsApp in seconds</li><li>Stock updates with every sale, with alerts</li><li>Every due amount listed, with reminders</li><li>Today’s sales and profit on one screen</li></ul></div>
+  </div>
+ </div></section>
+
+ <section class="section"><div class="wrap"><div class="bill-cta">
+  <span class="eyebrow">Built around your shop</span>
+  <h2>Want an App Like This <span class="grad-text">for Your Business?</span></h2>
+  <p>Tell us what you sell and how you bill today. We’ll show you a live demo on WhatsApp and share a clear quote before any work starts.</p>
+  <div class="actions"><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I want a billing & inventory app for my shop. Can you show me a demo?">◉ Book a Live Demo</a><a class="btn btn-ghost" href="#contact" data-service="Billing &amp; Inventory App">Fill Enquiry Form →</a></div>
+ </div></div></section>
+</div>
+
 <!-- ================= REELS ================= -->
 <div class="page" id="reels" data-title="Reels & Videos">
  <section class="section"><div class="wrap"><div class="split"><div><span class="eyebrow">Content that catches attention</span><h2>Make Your Brand <span class="gold">Impossible to Scroll Past.</span></h2><p class="muted">Short-form content that gives customers a reason to pause, discover your products and start a conversation. Great for local shops, food brands, boutiques and service businesses.</p><ul class="feature-list"><li><span class="check">✓</span> Product showcase reels and launch videos</li><li><span class="check">✓</span> Offer announcements and festival creatives</li><li><span class="check">✓</span> Product photography direction and visual concepts</li><li><span class="check">✓</span> Social-ready edits for Instagram, Facebook and WhatsApp Status</li><li><span class="check">✓</span> Captions, hashtags and a simple posting plan</li></ul><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I want to discuss reels / videos for my business.">Discuss Your Reel Idea on WhatsApp ↗</a></div>
@@ -188,6 +298,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
     <option value="">Choose a service</option>
     <option>QR Digital Shop — Standard ₹5,699</option>
     <option>QR Digital Shop + Personal UPI QR — ₹6,699</option>
+    <option>Billing &amp; Inventory App</option>
     <option>Website / Landing Page</option>
     <option>Reels &amp; Videos</option>
     <option>Excel Automation / Dashboards</option>
@@ -210,13 +321,14 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
 </div>
 </main>
 
-<footer><div class="wrap"><div class="footer-row"><a class="brand" href="#home">IZYAN <span>TECH WORLD</span></a><div class="footer-links"><a href="#home">Home</a><a href="#digital-shop">Digital Shop</a><a href="#reels">Reels &amp; Videos</a><a href="#automation">Automation &amp; Tools</a><a href="#contact">Contact</a><a href="#faq">FAQ</a></div><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services.">Talk on WhatsApp</a></div><div class="copyright">© <span id="year"></span> IZYAN TECH WORLD. Practical digital solutions for local &amp; growing businesses.</div></div></footer>
+<footer><div class="wrap"><div class="footer-row"><a class="brand" href="#home">IZYAN <span>TECH WORLD</span></a><div class="footer-links"><a href="#home">Home</a><a href="#digital-shop">Digital Shop</a><a href="#billing">Billing &amp; Inventory</a><a href="#reels">Reels &amp; Videos</a><a href="#automation">Automation &amp; Tools</a><a href="#contact">Contact</a><a href="#faq">FAQ</a></div><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services.">Talk on WhatsApp</a></div><div class="copyright">© <span id="year"></span> IZYAN TECH WORLD. Practical digital solutions for local &amp; growing businesses.</div></div></footer>
 
 <a class="whatsapp-float wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services." aria-label="Talk on WhatsApp">◉ WhatsApp</a>
 
 <nav class="tabbar" aria-label="Sections">
  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>Home</a>
  <a href="#digital-shop" data-tab="digital-shop"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Shop</a>
+ <a href="#billing" data-tab="billing"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6"/><path d="M9 12h6"/></svg>Billing</a>
  <a href="#reels" data-tab="reels"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg>Reels</a>
  <a href="#automation" data-tab="automation"><svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>Tools</a>
  <a href="#contact" data-tab="contact"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>Contact</a>
