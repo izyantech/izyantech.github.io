@@ -107,7 +107,15 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  .bill-grid,.case-grid,.plan-grid.three{grid-template-columns:1fr}.combo{grid-template-columns:1fr}.proj-drawer{--navh:64px}.cmp-head{grid-template-columns:1fr 1fr}.cmp-head>div:first-child{display:none}.cmp-row{grid-template-columns:1fr 1fr}.cmp-label{grid-column:1/-1;background:#0d2138;padding:10px 14px!important}.cmp-row>div{font-size:12.5px;padding:12px 14px}.cmp-them{padding-left:32px!important}.cmp-them:before,.cmp-mine:before{left:13px}.cmp-mine{padding-left:32px!important}.cmp-head>div{padding:12px 14px;font-size:10.5px}.combo-tag{writing-mode:horizontal-tb;transform:none;justify-self:start;padding:6px 10px}.combo .btn{justify-self:start}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
  .hero-grid,.split,.contact-grid{grid-template-columns:1fr}.hero{padding-top:52px}.visual{min-height:390px;margin:0 0 15px;order:1}.dash{right:0}.service-grid,.sample-grid,.reel-grid,.steps{grid-template-columns:repeat(2,1fr)}.section{padding:60px 0}.page-hero{padding:46px 0 0}.hero-grid{gap:12px}.mock-window{max-width:600px;margin:auto;width:100%}.demo-items{grid-template-columns:repeat(2,1fr)}
 }
+.whatsapp-float{display:inline-flex;align-items:center;gap:7px}body[data-tab="contact"] .whatsapp-float{display:none}.wf-ic{width:18px;height:18px;fill:currentColor;flex-shrink:0}
 @media(max-width:520px){
+ /* readability + touch on small phones */
+ .contact-form input,.contact-form select,.contact-form textarea{font-size:16px}
+ .stat span{font-size:11.5px!important}.badge,.happy{font-size:10px!important}.reel-tag{font-size:11px}.ba b{font-size:10.5px}
+ .case-strip small{font-size:11.5px!important;display:block;line-height:1.35}.case-strip div{padding:10px!important}
+ .cmp-head>div{font-size:11.5px!important}.live{font-size:10px!important}
+ .case-head{flex-wrap:wrap}.case-head .live{order:-1;margin:0 100% 2px 0}
+ .whatsapp-float{width:54px;height:54px;padding:0!important;justify-content:center;border-radius:50%;bottom:calc(84px + env(safe-area-inset-bottom))!important}.whatsapp-float .wf-t{display:none}.wf-ic{width:28px;height:28px}
  .wrap{width:min(100% - 28px,1160px)}.brand{font-size:15px}.brand span{font-size:10px}.hero{padding:42px 0 52px}h1{font-size:42px;letter-spacing:-1.7px}h2{font-size:30px}.hero-copy>p{font-size:14px}.actions{display:grid;grid-template-columns:1fr}.actions .btn{width:100%}.stats{gap:16px}.stat strong{font-size:22px}.stat span{font-size:10px}
  .visual{min-height:350px;transform:scale(.94);transform-origin:top center;margin-bottom:-5px}.phone{width:190px}.screen{min-height:280px}.dash{width:185px;right:-4px;top:20px;padding:12px}.reel-card{width:112px;height:150px;right:0;bottom:6px}.floating-label{left:-4px;bottom:22px;font-size:9px}
  .service-grid,.automation-grid,.reel-grid,.faq-grid,.plan-grid,.ba{grid-template-columns:1fr}.card{padding:19px}.sample-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sample-art{height:90px;font-size:32px}.sample-body{padding:11px}.sample-body h3{font-size:12px}.sample-body p{display:none}
@@ -392,7 +400,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
 
 <footer><div class="wrap"><div class="footer-row"><a class="brand" href="#home">IZYAN <span>TECH WORLD</span></a><div class="footer-links"><a href="#home">Home</a><a href="#digital-shop">Digital Shop</a><a href="#billing">Billing &amp; Inventory</a><a href="#reels">Reels &amp; Videos</a><a href="#automation">Automation &amp; Tools</a><a href="#contact">Contact</a><a href="#faq">FAQ</a></div><a class="btn btn-green wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services.">Talk on WhatsApp</a></div><div class="copyright">© <span id="year"></span> IZYAN TECH WORLD. Practical digital solutions for local &amp; growing businesses.</div></div></footer>
 
-<a class="whatsapp-float wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services." aria-label="Talk on WhatsApp">◉ WhatsApp</a>
+<a class="whatsapp-float wa-link" href="#" data-msg="Hi IZYAN TECH WORLD, I would like to know more about your services." aria-label="Talk on WhatsApp"><svg class="wf-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg><span class="wf-t">WhatsApp</span></a>
 
 <nav class="tabbar" aria-label="Sections">
  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>Home</a>
@@ -427,6 +435,7 @@ function route(){
     if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
   });
   document.title = page.dataset.title + ' | IZYAN TECH WORLD';
+  document.body.dataset.tab = page.id;
   if(target === page){
     window.scrollTo({top:0, behavior:'instant'});
   } else {
