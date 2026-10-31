@@ -48,6 +48,22 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
 .whatsapp-float{position:fixed;right:18px;bottom:18px;z-index:15;background:var(--green);color:#062515;border-radius:99px;padding:13px 17px;font-size:12px;font-weight:900;box-shadow:0 10px 35px #0008}
 /* demo modal */
 .modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);padding:20px}.modal.open{display:flex;align-items:center;justify-content:center}.modal-box{width:min(960px,100%);max-height:88vh;overflow:auto;background:#08182b;border:1px solid var(--line);border-radius:20px;padding:28px;position:relative;box-shadow:0 30px 100px rgba(0,0,0,.6)}.modal-close{position:absolute;right:14px;top:14px;border:0;background:#1a2c44;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}.modal-box h2{font-size:26px;padding-right:44px;margin-bottom:4px}.modal-box .sub{color:var(--muted);margin:0 0 20px;font-size:14px}.demo-items{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.demo-item{background:#102742;border:1px solid var(--line);border-radius:14px;padding:14px}.demo-item .art{height:96px;border-radius:10px;margin-bottom:10px;display:grid;place-items:center;font-size:32px}.demo-item b{display:block;font-size:14px}.demo-item small{display:block;color:var(--gold2);margin:4px 0 12px;font-weight:800}.demo-order{background:var(--green);color:#062214;border:0;border-radius:9px;padding:9px 12px;font-weight:800;cursor:pointer;width:100%;font-size:12px}
+/* projects drawer (shows on load, hides under the header, opens on click) */
+@property --fill{syntax:'<percentage>';inherits:false;initial-value:0%}
+.proj-drawer{--navh:76px;position:fixed;top:var(--navh);left:0;right:0;z-index:19;transform:translateY(-100%);transition:transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.proj-drawer.open{transform:translateY(0)}
+.proj-drawer .pd-panel{visibility:hidden;transition:visibility 0s linear .55s}.proj-drawer.open .pd-panel{visibility:visible;transition:visibility 0s}
+.pd-panel{pointer-events:auto;background:linear-gradient(135deg,#10243bf7,#08162af7);backdrop-filter:blur(16px);border-bottom:1px solid rgba(241,210,122,.35);box-shadow:0 24px 60px #000a;position:relative}
+.pd-inner{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center;padding:22px 0}
+.ring{--fill:0%;width:132px;height:132px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--gold2) 0 calc(var(--fill) * .4286),var(--green) calc(var(--fill) * .4286) var(--fill),#1a2f48 var(--fill) 100%);display:grid;place-items:center;position:relative;box-shadow:0 0 46px rgba(37,211,102,.18);transition:--fill 1.4s ease-out}
+.proj-drawer.open .ring{--fill:100%}
+.ring:after{content:"";position:absolute;inset:13px;border-radius:50%;background:#0a1a2d}.ring>div{position:relative;z-index:1;text-align:center}.ring b{display:block;font-size:38px;font-weight:950;line-height:1}.ring small{font-size:11px;color:var(--muted)}
+.pd-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;padding:5px 12px;border-radius:99px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.4);color:#bdeccf;margin-bottom:8px}
+.pd-copy h3{margin:0 0 2px;font-size:23px}.pd-copy p{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.legend{display:flex;gap:12px;flex-wrap:wrap}.lg{display:flex;align-items:center;gap:11px;padding:10px 15px;border-radius:14px;background:#0b1d31;border:1px solid var(--line);min-width:180px}.lg i{width:11px;height:11px;border-radius:4px;flex-shrink:0}.lg-ic{font-size:21px}.lg b{display:block;font-size:21px;line-height:1}.lg small{color:var(--muted);font-size:12px}
+.pd-timer{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}.pd-timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold2),var(--green));transform-origin:left;transform:scaleX(0)}.pd-timer.run i{animation:pdtimer var(--pdt,12s) linear forwards}@keyframes pdtimer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.pd-handle{pointer-events:auto;position:absolute;top:100%;left:50%;transform:translateX(-50%);border:1px solid rgba(241,210,122,.45);border-top:0;border-radius:0 0 14px 14px;background:#0c1f35;color:#e9eef6;font-size:12px;font-weight:700;padding:7px 16px 8px;cursor:pointer;white-space:nowrap;box-shadow:0 10px 24px #0007;transition:.2s}.pd-handle b{color:var(--gold2)}.pd-handle:hover{background:#12294a}.pd-arrow{display:inline-block;transition:transform .3s;color:var(--gold2)}.proj-drawer.open .pd-arrow{transform:rotate(180deg)}
+@media(prefers-reduced-motion:reduce){.proj-drawer,.ring{transition:none}.pd-timer.run i{animation:none}}
 /* billing & inventory tab */
 .nav-new{position:relative}.nav-new:after{content:"NEW";position:absolute;top:-6px;right:-4px;font-size:8px;font-weight:900;letter-spacing:.5px;background:var(--green);color:#062515;padding:2px 5px;border-radius:5px}
 .card-new{border-color:rgba(37,211,102,.45);background:radial-gradient(circle at 85% 0,rgba(37,211,102,.14),transparent 50%),linear-gradient(145deg,#10243bdb,#0a1a2d)}.badge-new{background:var(--green);color:#062515}
@@ -88,7 +104,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:25;background:#061323f5;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:10px;font-size:10px;font-weight:700;color:#9fb0c5}.tabbar svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.tabbar a.active{color:var(--gold2);background:#10243a}
  body{padding-bottom:72px}.whatsapp-float{bottom:86px;right:14px}.tabbar a{font-size:9.5px}
- .bill-grid,.case-grid,.plan-grid.three{grid-template-columns:1fr}.combo{grid-template-columns:1fr}.cmp-head{grid-template-columns:1fr 1fr}.cmp-head>div:first-child{display:none}.cmp-row{grid-template-columns:1fr 1fr}.cmp-label{grid-column:1/-1;background:#0d2138;padding:10px 14px!important}.cmp-row>div{font-size:12.5px;padding:12px 14px}.cmp-them{padding-left:32px!important}.cmp-them:before,.cmp-mine:before{left:13px}.cmp-mine{padding-left:32px!important}.cmp-head>div{padding:12px 14px;font-size:10.5px}.combo-tag{writing-mode:horizontal-tb;transform:none;justify-self:start;padding:6px 10px}.combo .btn{justify-self:start}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
+ .bill-grid,.case-grid,.plan-grid.three{grid-template-columns:1fr}.combo{grid-template-columns:1fr}.proj-drawer{--navh:64px}.cmp-head{grid-template-columns:1fr 1fr}.cmp-head>div:first-child{display:none}.cmp-row{grid-template-columns:1fr 1fr}.cmp-label{grid-column:1/-1;background:#0d2138;padding:10px 14px!important}.cmp-row>div{font-size:12.5px;padding:12px 14px}.cmp-them{padding-left:32px!important}.cmp-them:before,.cmp-mine:before{left:13px}.cmp-mine{padding-left:32px!important}.cmp-head>div{padding:12px 14px;font-size:10.5px}.combo-tag{writing-mode:horizontal-tb;transform:none;justify-self:start;padding:6px 10px}.combo .btn{justify-self:start}.bill-hero{padding:46px 0 20px}.feat-grid{grid-template-columns:repeat(2,1fr)}.vs{grid-template-columns:1fr}.vs-mid{transform:rotate(90deg);padding:4px 0}.app-stage{min-height:460px}
  .hero-grid,.split,.contact-grid{grid-template-columns:1fr}.hero{padding-top:52px}.visual{min-height:390px;margin:0 0 15px;order:1}.dash{right:0}.service-grid,.sample-grid,.reel-grid,.steps{grid-template-columns:repeat(2,1fr)}.section{padding:60px 0}.page-hero{padding:46px 0 0}.hero-grid{gap:12px}.mock-window{max-width:600px;margin:auto;width:100%}.demo-items{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:520px){
@@ -98,6 +114,7 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
  .steps{grid-template-columns:1fr 1fr;gap:9px}.step{padding:13px}.step p{font-size:11px}.section{padding:50px 0}.dark-panel{padding:21px}.mock-products{grid-template-columns:repeat(2,1fr)}.mock-item:last-child{display:none}.plan-price{font-size:31px}.footer-row{align-items:flex-start;flex-direction:column}.reel{min-height:220px}.flow{gap:6px}.flow span{font-size:11px}.contact-grid{gap:16px}
  .bill-copy h1{font-size:38px}.app-stage{min-height:450px}.app-ring{width:280px;height:280px}.app-phone{width:220px}.app-screen{min-height:400px;padding:12px}.float-bill{width:122px;left:-14px;top:14px;padding:9px}.float-bill b{font-size:10.5px}.float-bill .fb-wa{font-size:8.5px}.float-stock{right:-10px;top:150px;font-size:10px}.float-sync{right:-8px;bottom:-4px;font-size:10px}
  .feat-grid{gap:10px}.feat{padding:15px}.feat .fi{width:38px;height:38px;font-size:18px}.feat h3{font-size:13.5px}.feat p{font-size:11.5px}.case-in{padding:20px}.case-list{grid-template-columns:1fr}.case-strip{gap:6px}.case-strip div{padding:9px}.case-strip b{font-size:12px}.case-head h3{font-size:17px}.case-logo{width:46px;height:46px;font-size:22px}.case-logo.wide{width:84px}.logo-art img{max-height:66px}.logo-art img.sq{width:66px;height:66px;border-radius:16px}.bill-cta{padding:34px 18px}
+ .pd-inner{grid-template-columns:auto 1fr;gap:14px;padding:14px 0}.ring{width:92px;height:92px}.ring:after{inset:10px}.ring b{font-size:24px}.ring small{font-size:9.5px}.pd-badge{font-size:10px;padding:3px 9px;margin-bottom:5px}.pd-copy h3{font-size:15px;line-height:1.25}.pd-copy p{display:none}.legend{gap:7px;margin-top:8px}.lg{min-width:0;flex:1;padding:7px 9px;gap:7px}.lg i{display:none}.lg-ic{font-size:16px}.lg b{font-size:16px}.lg small{font-size:10px}.pd-handle{font-size:11px;padding:6px 13px 7px}
  .whatsapp-float{padding:12px 14px}.modal{padding:10px}.modal-box{padding:20px 16px}.demo-items{grid-template-columns:1fr 1fr;gap:9px}.demo-item{padding:10px}.demo-item .art{height:72px;font-size:26px}.demo-item b{font-size:12px}
 }
 </style>
@@ -117,6 +134,25 @@ footer{padding:30px 0;border-top:1px solid var(--line);background:#050f1d}.foote
   <a class="btn btn-gold" href="#contact">Get a Quote →</a>
  </div>
 </header>
+
+<aside class="proj-drawer" id="projDrawer" aria-label="Projects delivered">
+ <div class="pd-panel" id="projPanel">
+  <div class="wrap pd-inner">
+   <div class="ring" role="img" aria-label="7 of 7 projects delivered: 3 Digital Shops and 4 Billing Tools"><div><b><span class="count" data-to="7">7</span>/7</b><small>delivered</small></div></div>
+   <div class="pd-copy">
+    <span class="pd-badge">● 100% of received projects delivered</span>
+    <h3>7 Projects Received. 7 Delivered.</h3>
+    <p>Every project we took on has been delivered.</p>
+    <div class="legend">
+     <div class="lg"><i style="background:var(--gold2)"></i><span class="lg-ic">🛍️</span><div><b class="count" data-to="3">3</b><small>Digital Shops</small></div></div>
+     <div class="lg"><i style="background:var(--green)"></i><span class="lg-ic">🧾</span><div><b class="count" data-to="4">4</b><small>Billing Tools</small></div></div>
+    </div>
+   </div>
+  </div>
+  <div class="pd-timer" aria-hidden="true"><i></i></div>
+ </div>
+ <button class="pd-handle" id="projHandle" type="button" aria-expanded="false" aria-controls="projPanel">📊 <b>7/7</b> Projects Delivered <span class="pd-arrow">▾</span></button>
+</aside>
 
 <main>
 <!-- ================= HOME ================= -->
@@ -498,6 +534,58 @@ document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click'
 modal.querySelector('.modal-close').addEventListener('click', closeDemo);
 modal.addEventListener('click', e => { if(e.target === modal) closeDemo(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDemo(); });
+
+/* ---------- Projects drawer: auto-show once per visit, then tuck under the header ---------- */
+(function(){
+  const drawer = document.getElementById('projDrawer');
+  const handle = document.getElementById('projHandle');
+  const panel = document.getElementById('projPanel');
+  const timer = drawer.querySelector('.pd-timer');
+  const AUTO_MS = 12000;
+  let hideTimer = null;
+  const setOpen = open => {
+    drawer.classList.toggle('open', open);
+    handle.setAttribute('aria-expanded', String(open));
+  };
+  const stopAuto = () => {
+    if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
+    timer.classList.remove('run');
+  };
+  handle.addEventListener('click', () => { stopAuto(); setOpen(!drawer.classList.contains('open')); });
+  panel.addEventListener('pointerenter', e => { if(e.pointerType === 'mouse') stopAuto(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && drawer.classList.contains('open')){ stopAuto(); setOpen(false); } });
+
+  let seen = false;
+  try { seen = sessionStorage.getItem('itw_projects_seen') === '1'; sessionStorage.setItem('itw_projects_seen', '1'); } catch(err) {}
+  if(!seen){
+    setTimeout(() => {
+      setOpen(true);
+      timer.style.setProperty('--pdt', AUTO_MS + 'ms');
+      timer.classList.add('run');
+      hideTimer = setTimeout(() => { setOpen(false); timer.classList.remove('run'); hideTimer = null; }, AUTO_MS);
+    }, 500);
+  }
+})();
+
+/* ---------- Project counters (count up when visible) ---------- */
+(function(){
+  const counters = [...document.querySelectorAll('.count[data-to]')];
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce || !('IntersectionObserver' in window)) return;
+  const run = el => {
+    const to = parseInt(el.dataset.to, 10), start = performance.now(), dur = 1100;
+    const tick = now => {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if(p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if(en.isIntersecting){ run(en.target); io.unobserve(en.target); }
+  }), {threshold:.6});
+  counters.forEach(el => io.observe(el));
+})();
 
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
